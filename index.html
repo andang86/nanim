@@ -48,6 +48,14 @@
             height: 350px;
             max-height: 400px;
         }
+        [contenteditable="true"]:hover {
+            background-color: #fefce8;
+            outline: 1px solid #facc15;
+        }
+        [contenteditable="true"]:focus {
+            background-color: #fef9c3;
+            outline: 2px solid #f59e0b;
+        }
         @media (min-width: 768px) {
             .chart-container {
                 height: 400px;
@@ -76,7 +84,8 @@
         <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
             <button data-tab="support-details" class="tab-btn tab-active text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">유형별 지원 내용</button>
             <button data-tab="calculator" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">예상 비용 분석</button>
-            <button data-tab="nutrition" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">식이요법 및 영양 정보</button>
+            <button data-tab="schedule" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">나의 시술 일정표</button>
+            <button data-tab="nutrition" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">식이요법 정보</button>
             <button data-tab="process" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">신청 절차 안내</button>
             <button data-tab="contact" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">문의처 정보</button>
         </nav>
@@ -209,6 +218,34 @@
                     <div class="mt-4 text-center text-sm text-gray-500">
                         <p>※ 위 금액은 평균적인 시술비를 바탕으로 한 예상치이며, 병원 및 개인 상태에 따라 달라질 수 있습니다.</p>
                         <p>※ 건강보험 적용(급여) 부분은 총 시술비의 70%로 가정하여 산출했습니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="schedule" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">나의 시험관 시술 일정표</h2>
+                    <p class="text-center text-gray-600 mb-6">아래 표의 내용을 클릭하여 직접 수정하고 관리할 수 있습니다. (오늘 날짜: 8월 17일)</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3">날짜 (YYYY-MM-DD)</th>
+                                    <th scope="col" class="px-4 py-3">요일</th>
+                                    <th scope="col" class="px-4 py-3">시술/검사 내용</th>
+                                    <th scope="col" class="px-4 py-3">비고</th>
+                                    <th scope="col" class="px-4 py-3">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="schedule-body">
+                                <!-- Schedule rows will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-6">
+                        <button id="add-schedule-row" class="bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
+                            일정 추가
+                        </button>
                     </div>
                 </div>
             </section>
@@ -445,7 +482,7 @@
             };
 
             const krwFormatter = new Intl.NumberFormat('ko-KR');
-            const ctx = document.getElementById('costBreakdownChart').getContext('2d');
+            const costBreakdownChartCtx = document.getElementById('costBreakdownChart').getContext('2d');
             let costChart;
             const costBreakdownTextEl = document.getElementById('cost-breakdown-text');
 
@@ -461,7 +498,7 @@
                     costChart.destroy();
                 }
 
-                costChart = new Chart(ctx, {
+                costChart = new Chart(costBreakdownChartCtx, {
                     type: 'bar',
                     data: {
                         labels: [data.label],
@@ -532,8 +569,98 @@
             procedureSelector.addEventListener('change', (event) => {
                 renderCostChart(event.target.value);
             });
+            
+            if(document.getElementById('costBreakdownChart')) {
+                 renderCostChart('fresh');
+            }
 
-            renderCostChart('fresh');
+            // Schedule Planner Logic
+            let scheduleData = [
+                { date: '2025-08-14', event: '배란유도(난포자극) 주사 시작', notes: 'FSH/LH 계열·GnRH 항진 유도제 복합 처방' },
+                { date: '2025-08-17', event: '오늘', notes: '일정을 확인하고 수정하세요.' },
+                { date: '2025-08-19', event: '초음파 난포 모니터링(첫 모니터링)', notes: '난포 수·크기 측정, 혈액 에스트라디올 검사' },
+                { date: '2025-08-21', event: '초음파 난포 모니터링(2차 모니터링)', notes: '성장 속도에 따라 변동 가능' },
+                { date: '2025-08-22', event: '난포 최종 크기 확인 & 혈액 검사', notes: '트리거 주사 시기 결정' },
+                { date: '2025-08-23', event: '트리거 주사(난자 성숙 유도)', notes: 'hCG 또는 GnRH 작용제 투여 (채취 36시간 전)' },
+                { date: '2025-08-25', event: '난자채취(egg retrieval)', notes: '국소/수면마취. 2~3시간 관찰 후 퇴원' },
+                { date: '2025-08-26', event: '체외수정(IVF/ICSI)', notes: '채취 난자와 정자 결합' },
+                { date: '2025-08-30', event: '배아이식(embryo transfer) (Day-5)', notes: '블라스토시스트 단계 이식' },
+                { date: '2025-09-13', event: '혈액 임신반응검사(β-hCG)', notes: '이식 후 14일째' },
+                { date: '2025-09-20', event: '초음파 임신낭 및 심박동 확인', notes: '임신 주수 확인' }
+            ];
+
+            const scheduleBody = document.getElementById('schedule-body');
+            const addScheduleRowBtn = document.getElementById('add-schedule-row');
+
+            const getDayOfWeek = (dateString) => {
+                const days = ['일', '월', '화', '수', '목', '금', '토'];
+                try {
+                    const date = new Date(dateString + 'T00:00:00');
+                    if (isNaN(date)) return '';
+                    return days[date.getDay()];
+                } catch (e) {
+                    return '';
+                }
+            };
+
+            const renderSchedule = () => {
+                if(!scheduleBody) return;
+                scheduleBody.innerHTML = '';
+                const today = new Date('2025-08-17T00:00:00');
+
+                scheduleData.forEach((item, index) => {
+                    const itemDate = new Date(item.date + 'T00:00:00');
+                    let rowClass = '';
+                    if (itemDate < today) {
+                        rowClass = 'bg-gray-100 text-gray-400';
+                    } else if (itemDate.getTime() === today.getTime()) {
+                        rowClass = 'bg-yellow-100 font-bold';
+                    }
+
+                    const row = document.createElement('tr');
+                    row.className = `border-b ${rowClass}`;
+                    row.innerHTML = `
+                        <td class="px-4 py-2" contenteditable="true" data-col="date">${item.date}</td>
+                        <td class="px-4 py-2">${getDayOfWeek(item.date)}</td>
+                        <td class="px-4 py-2" contenteditable="true" data-col="event">${item.event}</td>
+                        <td class="px-4 py-2" contenteditable="true" data-col="notes">${item.notes}</td>
+                        <td class="px-4 py-2 text-center">
+                            <button class="delete-row-btn text-red-500 hover:text-red-700" data-index="${index}">삭제</button>
+                        </td>
+                    `;
+                    scheduleBody.appendChild(row);
+                });
+            };
+
+            if (addScheduleRowBtn) {
+                addScheduleRowBtn.addEventListener('click', () => {
+                    scheduleData.push({ date: 'YYYY-MM-DD', event: '새로운 일정', notes: '비고' });
+                    renderSchedule();
+                });
+            }
+
+            if (scheduleBody) {
+                scheduleBody.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('delete-row-btn')) {
+                        const index = e.target.dataset.index;
+                        scheduleData.splice(index, 1);
+                        renderSchedule();
+                    }
+                });
+
+                scheduleBody.addEventListener('blur', (e) => {
+                    if (e.target.hasAttribute('contenteditable')) {
+                        const index = e.target.closest('tr').querySelector('.delete-row-btn').dataset.index;
+                        const col = e.target.dataset.col;
+                        scheduleData[index][col] = e.target.innerText;
+                        if(col === 'date') {
+                           renderSchedule(); // Re-render to update day of week
+                        }
+                    }
+                }, true);
+            }
+
+            renderSchedule();
         });
     </script>
 
