@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025 청주시 난임부부 지원 통합 안내</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Soft Teal Accent -->
+    <!-- Application Structure Plan: The application is structured around the user's journey and key questions ("What can I get?", "How much?", "How do I apply?"). It abandons the report's bureaucratic structure (by-government-level) in favor of a user-centric, task-oriented design. The core is a tab-based navigation switching between four main views: 1) A thematic overview of available support types, 2) An interactive subsidy calculator for immediate financial insight, 3) A visualized step-by-step application guide, and 4) A consolidated contact list. This architecture prioritizes immediate value (key highlights), deep exploration (support details), practical tools (calculator), and actionable steps (application process), making complex information highly accessible and reducing user cognitive load. -->
+    <!-- Visualization & Content Choices: Report Info: Financial support amounts for IVF/IUI. -> Goal: Compare & Inform. -> Viz/Presentation: Interactive stacked bar chart (Chart.js). -> Interaction: User selects procedure type (radio buttons), chart updates dynamically. -> Justification: Visually breaks down the complex multi-layered funding (national, city) into an easily digestible comparison, answering the user's primary financial question more effectively than a table. Report Info: Multi-step application process. -> Goal: Organize & Guide. -> Viz/Presentation: Visual flowchart using HTML/CSS (Flexbox, borders, Unicode arrows). -> Interaction: Static visual guide. -> Justification: Transforms a dense wall of text into a clear, sequential process map, improving comprehension and reducing procedural errors. Accordions are used for detailed text to manage information density. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #FDFBF8;
+        }
+        .tab-active {
+            background-color: #0D9488;
+            color: white;
+            border-color: #0D9488;
+        }
+        .tab-inactive {
+            background-color: white;
+            color: #374151;
+            border-color: #D1D5DB;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-teal-800 mb-2">2025년 청주시 난임부부 지원 통합 안내</h1>
+            <p class="text-lg text-gray-600">청주시에 거주하는 난임부부를 위한 모든 지원 정보를 한 곳에 모았습니다.</p>
+        </header>
+
+        <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg mb-8">
+            <h2 class="font-bold text-amber-800">주요 변경사항 (2025년 기준)</h2>
+            <ul class="list-disc list-inside mt-2 text-amber-700 space-y-1">
+                <li><span class="font-semibold">소득 기준 전면 폐지:</span> 모든 난임부부가 지원 대상입니다.</li>
+                <li><span class="font-semibold">지원 횟수 확대:</span> '부부당 평생'에서 '출생아 1명당 25회'로 변경되었습니다.</li>
+                <li><span class="font-semibold">청주시 연령 차등 폐지:</span> 만 45세 이상도 동일한 지원을 받습니다.</li>
+            </ul>
+        </div>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+            <button data-tab="support-details" class="tab-btn tab-active text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">유형별 지원 내용</button>
+            <button data-tab="calculator" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">예상 지원금 계산</button>
+            <button data-tab="process" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">신청 절차 안내</button>
+            <button data-tab="contact" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">문의처 정보</button>
+        </nav>
+
+        <main>
+            <section id="support-details" class="content-section active">
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
+                            <span>① 난임 시술비 지원 (체외/인공수정)</span>
+                            <span class="transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t text-gray-700">
+                                <p class="mb-4">시험관 아기(체외수정) 및 인공수정 시술에 드는 비용의 본인부담금과 일부 비급여 항목을 지원합니다.</p>
+                                <ul class="space-y-2 list-disc list-inside">
+                                    <li><strong>지원 횟수:</strong> 출생아 1명당 총 25회 (체외수정 20회, 인공수정 5회)</li>
+                                    <li><strong>지원 상한액 (1회 기준):</strong>
+                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
+                                            <li>신선배아 체외수정: 최대 110만원</li>
+                                            <li>동결배아 체외수정: 최대 50만원</li>
+                                            <li>인공수정: 최대 30만원</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>비급여 3종 추가 지원:</strong> 배아동결비(최대 30만원), 착상보조제/유산방지제(각 최대 20만원)</li>
+                                    <li><strong>시술 중단 시:</strong> 의학적 사유로 중단 시, 횟수 차감 없이 발생 비용 지원</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
+                            <span>② 청주시 한방 난임치료 지원</span>
+                            <span class="transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t text-gray-700">
+                                <p class="mb-4">청주시의 특화 사업으로, 한의학적 치료를 통해 임신 성공을 돕습니다. 단, 보조생식술과 동시 진행은 불가합니다.</p>
+                                <ul class="space-y-2 list-disc list-inside">
+                                    <li><strong>지원 대상:</strong> 청주시 3개월 이상 거주 난임부부 (사실혼 포함)</li>
+                                    <li><strong>지원 내용:</strong> 6개월간 한약, 침, 뜸 등 치료 지원 (본인부담금 없음)</li>
+                                    <li><strong>지원 금액:</strong> 1인당 최대 138만 6천원 상당</li>
+                                    <li><strong>신청:</strong> 주소지 관할 보건소 방문 신청만 가능</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
+                            <span>③ 가임력 및 진단 검사비 지원</span>
+                            <span class="transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t text-gray-700">
+                                <p class="mb-4">건강한 임신 준비와 신속한 난임 진단을 위한 검사 비용을 지원합니다.</p>
+                                <ul class="space-y-2 list-disc list-inside">
+                                    <li><strong>청주시 가임력 검사비:</strong>
+                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
+                                            <li>대상: 청주시 20~49세 남녀 (결혼 무관)</li>
+                                            <li>지원: 여성 최대 13만원 (난소기능검사 등), 남성 최대 5만원 (정액검사 등)</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>충청북도 난임 진단검사비:</strong>
+                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
+                                             <li>대상: 충북 거주 난임 진단 부부</li>
+                                            <li>지원: 난소기능검사, 난관조영술 등 최대 20만원</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
+                            <span>④ 가임력 보존 및 기타 지원</span>
+                            <span class="transform transition-transform duration-300">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-4 border-t text-gray-700">
+                                <p class="mb-4">미래의 임신을 준비하거나, 치료 과정에서 겪는 어려움을 덜어주는 지원입니다.</p>
+                                <ul class="space-y-2 list-disc list-inside">
+                                    <li><strong>청주시 냉동난자 사용 보조생식술:</strong>
+                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
+                                            <li>지원: 회당 최대 100만원 (부부당 최대 2회)</li>
+                                        </ul>
+                                    </li>
+                                     <li><strong>난임치료휴가:</strong>
+                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
+                                            <li>지원: 연간 총 6일 (최초 2일 유급)</li>
+                                        </ul>
+                                    </li>
+                                    <li><strong>난임·우울증 심리상담:</strong>
+                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
+                                            <li>지원: 중앙 난임·우울증상담센터에서 전문가 무료 상담 제공</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="calculator" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">난임 시술비 예상 지원금 계산기</h2>
+                    <p class="text-center text-gray-600 mb-6">알고 싶은 시술 종류를 선택하시면 최대 지원금을 시각적으로 보여드립니다.</p>
+                    <div id="procedure-selector" class="flex justify-center gap-4 mb-6">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="procedure" value="fresh" class="sr-only peer" checked>
+                            <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">신선배아</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="procedure" value="frozen" class="sr-only peer">
+                            <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">동결배아</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="procedure" value="iui" class="sr-only peer">
+                            <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">인공수정</div>
+                        </label>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="supportChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center text-sm text-gray-500">
+                        <p>※ 위 금액은 1회당 최대 지원 상한액이며, 실제 지원금은 발생한 본인부담금에 따라 달라질 수 있습니다.</p>
+                        <p>※ 비급여 3종(배아동결, 착상/유산방지) 비용은 별도 지원됩니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="process" class="content-section">
+                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">한눈에 보는 신청 절차</h2>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 text-center">
+                        <div class="flex flex-col items-center p-2">
+                            <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">1</div>
+                            <h3 class="font-semibold">난임 진단서 발급</h3>
+                            <p class="text-sm text-gray-600">지정 의료기관 방문</p>
+                        </div>
+                        <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
+                        <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
+                        <div class="flex flex-col items-center p-2">
+                            <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">2</div>
+                            <h3 class="font-semibold">지원 신청 (시술 전)</h3>
+                            <p class="text-sm text-gray-600">보건소 또는 온라인</p>
+                        </div>
+                        <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
+                         <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
+                        <div class="flex flex-col items-center p-2">
+                            <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">3</div>
+                            <h3 class="font-semibold">지원결정통지서 발급</h3>
+                            <p class="text-sm text-gray-600">(유효기간 3개월)</p>
+                        </div>
+                        <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
+                        <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
+                        <div class="flex flex-col items-center p-2">
+                            <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">4</div>
+                            <h3 class="font-semibold">시술 및 비용 정산</h3>
+                            <p class="text-sm text-gray-600">병원에 통지서 제출</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-amber-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-amber-800">필수 구비 서류</h4>
+                        <ul class="list-disc list-inside mt-2 text-amber-700 text-sm">
+                            <li>난임부부 시술비 지원 신청서</li>
+                            <li>난임 진단서 원본 (최초 신청 시)</li>
+                            <li>부부 모두의 건강보험증 사본 (또는 자격확인서)</li>
+                            <li>주민등록등본</li>
+                            <li>(사실혼의 경우) 사실혼 관계 증명 서류 추가 필요</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contact" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">청주시 보건소 및 관련 기관 연락처</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border p-4 rounded-lg">
+                            <h3 class="font-bold text-lg">상당보건소</h3>
+                            <p class="text-gray-600">모자보건팀: <a href="tel:043-201-3627" class="text-teal-600 hover:underline">043-201-3627</a></p>
+                        </div>
+                        <div class="border p-4 rounded-lg">
+                            <h3 class="font-bold text-lg">서원보건소</h3>
+                            <p class="text-gray-600">모자보건팀: <a href="tel:043-201-3270" class="text-teal-600 hover:underline">043-201-3270</a></p>
+                        </div>
+                        <div class="border p-4 rounded-lg">
+                            <h3 class="font-bold text-lg">흥덕보건소</h3>
+                            <p class="text-gray-600">모자보건팀: <a href="tel:043-201-3365" class="text-teal-600 hover:underline">043-201-3365</a></p>
+                        </div>
+                        <div class="border p-4 rounded-lg">
+                            <h3 class="font-bold text-lg">청원보건소</h3>
+                            <p class="text-gray-600">모자보건팀: <a href="tel:043-201-3493" class="text-teal-600 hover:underline">043-201-3493</a></p>
+                        </div>
+                    </div>
+                    <div class="mt-6 border-t pt-4">
+                         <h3 class="font-bold text-lg text-center">온라인 신청 및 정보</h3>
+                         <div class="flex justify-center gap-4 mt-2">
+                            <a href="https://www.gov.kr" target="_blank" class="text-teal-600 hover:underline">정부24</a>
+                            <span class="text-gray-300">|</span>
+                            <a href="https://www.e-health.go.kr" target="_blank" class="text-teal-600 hover:underline">e보건소</a>
+                         </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const sections = document.querySelectorAll('.content-section');
+            const accordions = document.querySelectorAll('.accordion-item');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.dataset.tab;
+
+                    tabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.add('tab-inactive');
+                    });
+                    tab.classList.add('tab-active');
+                    tab.classList.remove('tab-inactive');
+
+                    sections.forEach(section => {
+                        if (section.id === target) {
+                            section.classList.add('active');
+                        } else {
+                            section.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            accordions.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = header.querySelector('span:last-child');
+
+                header.addEventListener('click', () => {
+                    const isOpened = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    
+                    accordions.forEach(i => {
+                        i.querySelector('.accordion-content').style.maxHeight = '0px';
+                        i.querySelector('.accordion-header span:last-child').style.transform = 'rotate(0deg)';
+                    });
+
+                    if (!isOpened) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            const supportData = {
+                fresh: {
+                    label: '신선배아 체외수정',
+                    amount: 1100000,
+                },
+                frozen: {
+                    label: '동결배아 체외수정',
+                    amount: 500000,
+                },
+                iui: {
+                    label: '인공수정',
+                    amount: 300000,
+                }
+            };
+
+            const ctx = document.getElementById('supportChart').getContext('2d');
+            let supportChart;
+
+            function renderChart(procedure) {
+                const data = supportData[procedure];
+                if (supportChart) {
+                    supportChart.destroy();
+                }
+                supportChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [data.label],
+                        datasets: [{
+                            label: '최대 지원금 (원)',
+                            data: [data.amount],
+                            backgroundColor: ['#0D9488'],
+                            borderColor: ['#047857'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += new Intl.NumberFormat('ko-KR').format(context.parsed.x) + '원';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return new Intl.NumberFormat('ko-KR', { notation: 'compact' }).format(value);
+                                    }
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const procedureSelector = document.getElementById('procedure-selector');
+            procedureSelector.addEventListener('change', (event) => {
+                renderChart(event.target.value);
+            });
+
+            renderChart('fresh');
+        });
+    </script>
+
+</body>
+</html>
