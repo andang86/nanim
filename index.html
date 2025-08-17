@@ -45,12 +45,12 @@
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
-            height: 320px;
-            max-height: 400px;
+            height: 300px;
+            max-height: 350px;
         }
         @media (min-width: 768px) {
             .chart-container {
-                height: 400px;
+                height: 350px;
             }
         }
     </style>
@@ -75,7 +75,8 @@
 
         <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
             <button data-tab="support-details" class="tab-btn tab-active text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">유형별 지원 내용</button>
-            <button data-tab="calculator" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">예상 지원금 계산</button>
+            <button data-tab="calculator" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">예상 비용 분석</button>
+            <button data-tab="nutrition" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">식이요법 및 영양 정보</button>
             <button data-tab="process" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">신청 절차 안내</button>
             <button data-tab="contact" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">문의처 정보</button>
         </nav>
@@ -181,9 +182,9 @@
             
             <section id="calculator" class="content-section">
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">난임 시술비 예상 지원금 계산기</h2>
-                    <p class="text-center text-gray-600 mb-6">알고 싶은 시술 종류를 선택하시면 최대 지원금을 시각적으로 보여드립니다.</p>
-                    <div id="procedure-selector" class="flex justify-center gap-4 mb-6">
+                    <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">난임 시술비용 분석 (만 40세 기준)</h2>
+                    <p class="text-center text-gray-600 mb-6">시술 종류를 선택하시면 최대 지원금과 예상 본인부담금을 함께 보여드립니다.</p>
+                    <div id="procedure-selector" class="flex justify-center flex-wrap gap-4 mb-8">
                         <label class="cursor-pointer">
                             <input type="radio" name="procedure" value="fresh" class="sr-only peer" checked>
                             <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">신선배아</div>
@@ -197,12 +198,104 @@
                             <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">인공수정</div>
                         </label>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="supportChart"></canvas>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-lg font-semibold text-center mb-2 text-gray-700">최대 정부 지원금</h3>
+                             <div class="chart-container" style="height: 250px; max-height: 250px;">
+                                <canvas id="supportChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-center mb-2 text-gray-700">예상 비용 구성</h3>
+                            <div class="chart-container" style="height: 250px; max-height: 250px;">
+                                <canvas id="patientCostChart"></canvas>
+                            </div>
+                        </div>
                     </div>
+
+                    <div id="cost-breakdown" class="mt-8 bg-gray-50 p-4 rounded-lg text-center">
+                    </div>
+
                     <div class="mt-4 text-center text-sm text-gray-500">
-                        <p>※ 위 금액은 1회당 최대 지원 상한액이며, 실제 지원금은 발생한 본인부담금에 따라 달라질 수 있습니다.</p>
-                        <p>※ 비급여 3종(배아동결, 착상/유산방지) 비용은 별도 지원됩니다.</p>
+                        <p>※ 위 금액은 평균적인 시술비를 바탕으로 한 예상치이며, 병원 및 개인 상태에 따라 달라질 수 있습니다.</p>
+                        <p>※ 본인부담금은 총 예상 시술비에서 최대 정부 지원금을 제외한 금액입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="nutrition" class="content-section">
+                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                    <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">식이요법 및 영양 정보 (임상 증거 기반)</h2>
+                    <div class="space-y-4">
+                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-red-600 flex justify-between items-center">
+                                <span>▼ 피해야 할 음식 및 성분</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 border-t text-gray-700">
+                                    <ul class="space-y-3">
+                                        <li><strong>혈당지수(GI) 높은 식품:</strong> 흰 쌀밥, 흰 밀가루(빵, 국수), 정제 설탕(과자, 음료) 등. <br><span class="text-sm text-gray-500">임상 근거: 배란장애 난임 위험 90% 증가와 관련.</span></li>
+                                        <li><strong>트랜스지방 함유 식품:</strong> 도너츠, 감자튀김, 마가린 등 가공식품. <br><span class="text-sm text-gray-500">임상 근거: 소량 섭취만으로도 배란장애 위험 증가.</span></li>
+                                        <li><strong>과도한 동물성 단백질:</strong> 적색육(소고기, 돼지고기) 위주의 식단. <br><span class="text-sm text-gray-500">임상 근거: 배란장애 난임 위험 33% 증가. 식물성 단백질로 대체 시 위험 50% 이상 감소.</span></li>
+                                        <li><strong>기타:</strong> 야식, 알코올, 과도한 카페인(하루 1잔 이하 권장).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-green-700 flex justify-between items-center">
+                                <span>▲ 추천되는 음식 및 식단</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 border-t text-gray-700">
+                                    <ul class="space-y-3">
+                                        <li><strong>십자화과 채소:</strong> 브로콜리, 케일, 양배추 등. <br><span class="text-sm text-gray-500">효능: 인슐린 저항성 개선 및 호르몬 균형에 도움.</span></li>
+                                        <li><strong>지중해식 식단:</strong> 통곡물(현미), 식물성 단백질(콩, 두부), 좋은 지방(견과류, 올리브유), 등푸른 생선(작은 크기). <br><span class="text-sm text-gray-500">임상 근거: 난임 치료 후 정상 출산율 유의미하게 증가.</span></li>
+                                        <li><strong>항산화 식품:</strong> 해조류(미역, 김), 신선한 채소와 과일. <br><span class="text-sm text-gray-500">효능: 자궁 혈류 개선 및 세포 손상 방지.</span></li>
+                                        <li><strong>규칙적인 식사 패턴:</strong> 아침 식사를 충분히 하고, 저녁은 가볍게. 간헐적 단식(16:8)도 일부 PCOS 환자에게 긍정적 효과.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-blue-700 flex justify-between items-center">
+                                <span>💊 추천되는 영양제 (의사 상담 필수)</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 border-t text-gray-700">
+                                    <ul class="space-y-3">
+                                        <li><strong>이노시톨 (4000mg/일):</strong> 인슐린 저항성 및 호르몬 균형 개선, 배란율 향상에 도움.</li>
+                                        <li><strong>오메가-3 (2000-4000mg/일):</strong> 항염증 효과, 인슐린 저항성 및 남성호르몬 수치 개선.</li>
+                                        <li><strong>비타민 D:</strong> 혈중 농도 검사 후 적정량 복용. 월경 주기 정상화 및 호르몬 균형에 기여.</li>
+                                        <li><strong>엽산 (400-800μg/일):</strong> 난자 질 개선 및 태아 기형아 예방을 위한 필수 영양소.</li>
+                                        <li><strong>메트포르민:</strong> 의사 처방이 필요한 전문의약품으로, 인슐린 저항성 개선에 효과적.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-red-600 flex justify-between items-center">
+                                <span>🚫 피해야 할 약물 (임산부 금기 약물)</span>
+                                <span class="transform transition-transform duration-300">▼</span>
+                            </button>
+                            <div class="accordion-content">
+                                <div class="p-4 border-t text-gray-700">
+                                    <ul class="space-y-3">
+                                        <li><strong>절대 금기 (FDA X등급):</strong> 이소트레티노인(여드름약), 와파린(혈전증약), 아토르바스타틴(고지혈증약) 등.</li>
+                                        <li><strong>체중감량제 (삭센다 등):</strong> 임신 준비 시 중단 필요. 시술 중 마취 위험 증가.</li>
+                                        <li><strong>주의 필요 약물:</strong> 이부프로펜 등 일부 해열진통제, 고용량 아스피린, 항우울제 등은 반드시 의사와 상의 후 복용.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg">
+                        <h4 class="font-bold text-amber-800">가장 중요한 원칙</h4>
+                        <p class="mt-2 text-amber-700">모든 식이요법, 영양제, 약물 복용은 개인의 건강 상태에 따라 효과와 부작용이 다를 수 있습니다. **반드시 담당 주치의와 상의하여 본인에게 맞는 계획을 세우는 것이 가장 중요합니다.**</p>
                     </div>
                 </div>
             </section>
@@ -320,42 +413,38 @@
                 header.addEventListener('click', () => {
                     const isOpened = content.style.maxHeight && content.style.maxHeight !== '0px';
                     
-                    accordions.forEach(i => {
-                        i.querySelector('.accordion-content').style.maxHeight = '0px';
-                        i.querySelector('.accordion-header span:last-child').style.transform = 'rotate(0deg)';
-                    });
-
                     if (!isOpened) {
                         content.style.maxHeight = content.scrollHeight + 'px';
                         icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        content.style.maxHeight = '0px';
+                        icon.style.transform = 'rotate(0deg)';
                     }
                 });
             });
 
             const supportData = {
-                fresh: {
-                    label: '신선배아 체외수정',
-                    amount: 1100000,
-                },
-                frozen: {
-                    label: '동결배아 체외수정',
-                    amount: 500000,
-                },
-                iui: {
-                    label: '인공수정',
-                    amount: 300000,
-                }
+                fresh: { label: '신선배아 체외수정', amount: 1100000, total: 4000000 },
+                frozen: { label: '동결배아 체외수정', amount: 500000, total: 2000000 },
+                iui: { label: '인공수정', amount: 300000, total: 800000 }
             };
 
-            const ctx = document.getElementById('supportChart').getContext('2d');
-            let supportChart;
+            const krwFormatter = new Intl.NumberFormat('ko-KR');
 
-            function renderChart(procedure) {
+            const ctxSupport = document.getElementById('supportChart').getContext('2d');
+            let supportChart;
+            
+            const ctxPatient = document.getElementById('patientCostChart').getContext('2d');
+            let patientCostChart;
+            
+            const costBreakdownEl = document.getElementById('cost-breakdown');
+
+            function renderCharts(procedure) {
                 const data = supportData[procedure];
-                if (supportChart) {
-                    supportChart.destroy();
-                }
-                supportChart = new Chart(ctx, {
+                const patientShare = data.total - data.amount;
+
+                if (supportChart) supportChart.destroy();
+                supportChart = new Chart(ctxSupport, {
                     type: 'bar',
                     data: {
                         labels: [data.label],
@@ -368,25 +457,12 @@
                         }]
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        indexAxis: 'y',
+                        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
                         plugins: {
-                            legend: {
-                                display: false
-                            },
+                            legend: { display: false },
                             tooltip: {
                                 callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed.x !== null) {
-                                            label += new Intl.NumberFormat('ko-KR').format(context.parsed.x) + '원';
-                                        }
-                                        return label;
-                                    }
+                                    label: (context) => `${context.dataset.label || ''}: ${krwFormatter.format(context.parsed.x)}원`
                                 }
                             }
                         },
@@ -394,27 +470,52 @@
                             x: {
                                 beginAtZero: true,
                                 ticks: {
-                                    callback: function(value, index, values) {
-                                        return new Intl.NumberFormat('ko-KR', { notation: 'compact' }).format(value);
-                                    }
+                                    callback: (value) => new Intl.NumberFormat('ko-KR', { notation: 'compact' }).format(value)
                                 }
                             },
-                            y: {
-                                grid: {
-                                    display: false
+                            y: { grid: { display: false } }
+                        }
+                    }
+                });
+
+                if (patientCostChart) patientCostChart.destroy();
+                patientCostChart = new Chart(ctxPatient, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['정부 지원금', '예상 본인부담금'],
+                        datasets: [{
+                            data: [data.amount, patientShare],
+                            backgroundColor: ['#0D9488', '#F9A825'],
+                            borderColor: ['#FDFBF8'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${context.label}: ${krwFormatter.format(context.raw)}원`
                                 }
                             }
                         }
                     }
                 });
+                
+                costBreakdownEl.innerHTML = `
+                    <p class="text-gray-600">총 예상 시술비: <span class="font-bold text-black">${krwFormatter.format(data.total)}원</span></p>
+                    <p class="text-teal-700">최대 정부 지원: <span class="font-bold">${krwFormatter.format(data.amount)}원</span></p>
+                    <p class="text-amber-600">예상 본인부담금: <span class="font-bold">${krwFormatter.format(patientShare)}원</span></p>
+                `;
             }
 
             const procedureSelector = document.getElementById('procedure-selector');
             procedureSelector.addEventListener('change', (event) => {
-                renderChart(event.target.value);
+                renderCharts(event.target.value);
             });
 
-            renderChart('fresh');
+            renderCharts('fresh');
         });
     </script>
 
