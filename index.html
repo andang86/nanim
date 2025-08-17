@@ -42,15 +42,15 @@
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             margin-left: auto;
             margin-right: auto;
-            height: 300px;
-            max-height: 350px;
+            height: 350px;
+            max-height: 400px;
         }
         @media (min-width: 768px) {
             .chart-container {
-                height: 350px;
+                height: 400px;
             }
         }
     </style>
@@ -182,8 +182,8 @@
             
             <section id="calculator" class="content-section">
                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">난임 시술비용 분석 (만 40세 기준)</h2>
-                    <p class="text-center text-gray-600 mb-6">시술 종류를 선택하시면 최대 지원금과 예상 본인부담금을 함께 보여드립니다.</p>
+                    <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">시술별 최종 본인부담금 예상 분석</h2>
+                    <p class="text-center text-gray-600 mb-6">시술 종류를 선택하시면 건강보험과 정부 지원을 모두 반영한 최종 비용을 보여드립니다.</p>
                     <div id="procedure-selector" class="flex justify-center flex-wrap gap-4 mb-8">
                         <label class="cursor-pointer">
                             <input type="radio" name="procedure" value="fresh" class="sr-only peer" checked>
@@ -199,27 +199,16 @@
                         </label>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <h3 class="text-lg font-semibold text-center mb-2 text-gray-700">최대 정부 지원금</h3>
-                             <div class="chart-container" style="height: 250px; max-height: 250px;">
-                                <canvas id="supportChart"></canvas>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-center mb-2 text-gray-700">예상 비용 구성</h3>
-                            <div class="chart-container" style="height: 250px; max-height: 250px;">
-                                <canvas id="patientCostChart"></canvas>
-                            </div>
-                        </div>
+                    <div class="chart-container">
+                        <canvas id="costBreakdownChart"></canvas>
                     </div>
 
-                    <div id="cost-breakdown" class="mt-8 bg-gray-50 p-4 rounded-lg text-center">
+                    <div id="cost-breakdown-text" class="mt-6 bg-gray-50 p-4 rounded-lg text-center space-y-2">
                     </div>
 
                     <div class="mt-4 text-center text-sm text-gray-500">
                         <p>※ 위 금액은 평균적인 시술비를 바탕으로 한 예상치이며, 병원 및 개인 상태에 따라 달라질 수 있습니다.</p>
-                        <p>※ 본인부담금은 총 예상 시술비에서 최대 정부 지원금을 제외한 금액입니다.</p>
+                        <p>※ 건강보험 적용(급여) 부분은 총 시술비의 70%로 가정하여 산출했습니다.</p>
                     </div>
                 </div>
             </section>
@@ -230,7 +219,7 @@
                     <div class="space-y-4">
                         <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
                             <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
-                                <span>� 난포 성장에 좋은 음식 & 피해야 할 음식</span>
+                                <span>🥚 난포 성장에 좋은 음식 & 피해야 할 음식</span>
                                 <span class="transform transition-transform duration-300">▼</span>
                             </button>
                             <div class="accordion-content">
@@ -449,102 +438,104 @@
                 });
             });
 
-            const supportData = {
-                fresh: { label: '신선배아 체외수정', amount: 1100000, total: 4000000 },
-                frozen: { label: '동결배아 체외수정', amount: 500000, total: 2000000 },
-                iui: { label: '인공수정', amount: 300000, total: 800000 }
+            const costData = {
+                fresh: { label: '신선배아 체외수정', maxSupport: 1100000, total: 4000000 },
+                frozen: { label: '동결배아 체외수정', maxSupport: 500000, total: 2000000 },
+                iui: { label: '인공수정', maxSupport: 300000, total: 800000 }
             };
 
             const krwFormatter = new Intl.NumberFormat('ko-KR');
+            const ctx = document.getElementById('costBreakdownChart').getContext('2d');
+            let costChart;
+            const costBreakdownTextEl = document.getElementById('cost-breakdown-text');
 
-            const ctxSupport = document.getElementById('supportChart').getContext('2d');
-            let supportChart;
-            
-            const ctxPatient = document.getElementById('patientCostChart').getContext('2d');
-            let patientCostChart;
-            
-            const costBreakdownEl = document.getElementById('cost-breakdown');
+            function renderCostChart(procedure) {
+                const data = costData[procedure];
+                
+                const nhiCoverage = data.total * 0.7;
+                const initialPatientCost = data.total * 0.3;
+                const governmentSupport = Math.min(initialPatientCost, data.maxSupport);
+                const finalPatientCost = initialPatientCost - governmentSupport;
 
-            function renderCharts(procedure) {
-                const data = supportData[procedure];
-                const patientShare = data.total - data.amount;
+                if (costChart) {
+                    costChart.destroy();
+                }
 
-                if (supportChart) supportChart.destroy();
-                supportChart = new Chart(ctxSupport, {
+                costChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: [data.label],
-                        datasets: [{
-                            label: '최대 지원금 (원)',
-                            data: [data.amount],
-                            backgroundColor: ['#0D9488'],
-                            borderColor: ['#047857'],
-                            borderWidth: 1
-                        }]
+                        datasets: [
+                            {
+                                label: '건강보험 적용분',
+                                data: [nhiCoverage],
+                                backgroundColor: '#A7C4B5', // Soft Green
+                            },
+                            {
+                                label: '정부 지원금',
+                                data: [governmentSupport],
+                                backgroundColor: '#0D9488', // Teal
+                            },
+                            {
+                                label: '최종 본인부담금',
+                                data: [finalPatientCost],
+                                backgroundColor: '#F9A825', // Amber
+                            }
+                        ]
                     },
                     options: {
-                        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false },
+                            legend: {
+                                position: 'bottom',
+                            },
                             tooltip: {
                                 callbacks: {
-                                    label: (context) => `${context.dataset.label || ''}: ${krwFormatter.format(context.parsed.x)}원`
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        label += krwFormatter.format(context.raw) + '원';
+                                        return label;
+                                    }
                                 }
                             }
                         },
                         scales: {
                             x: {
-                                beginAtZero: true,
+                                stacked: true,
                                 ticks: {
                                     callback: (value) => new Intl.NumberFormat('ko-KR', { notation: 'compact' }).format(value)
                                 }
                             },
-                            y: { grid: { display: false } }
-                        }
-                    }
-                });
-
-                if (patientCostChart) patientCostChart.destroy();
-                patientCostChart = new Chart(ctxPatient, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['정부 지원금', '예상 본인부담금'],
-                        datasets: [{
-                            data: [data.amount, patientShare],
-                            backgroundColor: ['#0D9488', '#F9A825'],
-                            borderColor: ['#FDFBF8'],
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom' },
-                            tooltip: {
-                                callbacks: {
-                                    label: (context) => `${context.label}: ${krwFormatter.format(context.raw)}원`
-                                }
+                            y: {
+                                stacked: true,
+                                grid: { display: false }
                             }
                         }
                     }
                 });
-                
-                costBreakdownEl.innerHTML = `
+
+                costBreakdownTextEl.innerHTML = `
                     <p class="text-gray-600">총 예상 시술비: <span class="font-bold text-black">${krwFormatter.format(data.total)}원</span></p>
-                    <p class="text-teal-700">최대 정부 지원: <span class="font-bold">${krwFormatter.format(data.amount)}원</span></p>
-                    <p class="text-amber-600">예상 본인부담금: <span class="font-bold">${krwFormatter.format(patientShare)}원</span></p>
+                    <div class="w-full border-t my-2"></div>
+                    <p class="text-gray-500"> └ 건강보험 적용: <span class="font-semibold">${krwFormatter.format(nhiCoverage)}원</span></p>
+                    <p class="text-teal-700"> └ 정부 지원금: <span class="font-semibold">${krwFormatter.format(governmentSupport)}원</span></p>
+                    <p class="text-amber-600"> └ <span class="font-bold">최종 본인부담금:</span> <span class="font-extrabold text-lg">${krwFormatter.format(finalPatientCost)}원</span></p>
                 `;
             }
 
             const procedureSelector = document.getElementById('procedure-selector');
             procedureSelector.addEventListener('change', (event) => {
-                renderCharts(event.target.value);
+                renderCostChart(event.target.value);
             });
 
-            renderCharts('fresh');
+            renderCostChart('fresh');
         });
     </script>
 
 </body>
 </html>
-�
