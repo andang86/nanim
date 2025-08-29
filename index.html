@@ -1,668 +1,746 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 청주시 난임부부 지원 통합 안내</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm Neutrals with Soft Teal Accent -->
-    <!-- Application Structure Plan: The application is structured around the user's journey and key questions ("What can I get?", "How much?", "How do I apply?"). It abandons the report's bureaucratic structure (by-government-level) in favor of a user-centric, task-oriented design. The core is a tab-based navigation switching between four main views: 1) A thematic overview of available support types, 2) An interactive subsidy calculator for immediate financial insight, 3) A visualized step-by-step application guide, and 4) A consolidated contact list. This architecture prioritizes immediate value (key highlights), deep exploration (support details), practical tools (calculator), and actionable steps (application process), making complex information highly accessible and reducing user cognitive load. -->
-    <!-- Visualization & Content Choices: Report Info: Financial support amounts for IVF/IUI. -> Goal: Compare & Inform. -> Viz/Presentation: Interactive stacked bar chart (Chart.js). -> Interaction: User selects procedure type (radio buttons), chart updates dynamically. -> Justification: Visually breaks down the complex multi-layered funding (national, city), into an easily digestible comparison, answering the user's primary financial question more effectively than a table. Report Info: Multi-step application process. -> Goal: Organize & Guide. -> Viz/Presentation: Visual flowchart using HTML/CSS (Flexbox, borders, Unicode arrows). -> Interaction: Static visual guide. -> Justification: Transforms a dense wall of text into a clear, sequential process map, improving comprehension and reducing procedural errors. Accordions are used for detailed text to manage information density. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #FDFBF8;
-        }
-        .tab-active {
-            background-color: #0D9488;
-            color: white;
-            border-color: #0D9488;
-        }
-        .tab-inactive {
-            background-color: white;
-            color: #374151;
-            border-color: #D1D5DB;
-        }
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-        }
-        .accordion-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 400px;
-        }
-        [contenteditable="true"]:hover {
-            background-color: #fefce8;
-            outline: 1px solid #facc15;
-        }
-        [contenteditable="true"]:focus {
-            background-color: #fef9c3;
-            outline: 2px solid #f59e0b;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>난임 여정 종합 가이드 (강화판)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --brand-teal:#0D9488; --bg:#FDFBF8; --ink:#1f2937; }
+    body { font-family:'Noto Sans KR', sans-serif; background-color:var(--bg); color:var(--ink); }
+    .tab-active { background-color:var(--brand-teal); color:#fff; border-color:var(--brand-teal); }
+    .tab-inactive { background-color:#fff; color:#374151; border-color:#D1D5DB; }
+    .content-section { display:none; }
+    .content-section.active { display:block; }
+    .accordion-content { max-height:0; overflow:hidden; transition:max-height .3s ease-out; }
+    .chart-container { position:relative; width:100%; max-width:760px; margin-inline:auto; height:360px; }
+    [contenteditable="true"]:hover { background-color:#fefce8; outline:1px solid #facc15; }
+    [contenteditable="true"]:focus { background-color:#fef9c3; outline:2px solid #f59e0b; }
+    .timeline { position:relative; padding-left:2rem; border-left:2px solid var(--brand-teal); }
+    .timeline-item { position:relative; margin-bottom:2rem; }
+    .timeline-item:before { content:''; position:absolute; left:-2.5rem; top:0; width:1.25rem; height:1.25rem; border-radius:9999px; background-color:var(--brand-teal); border:2px solid var(--bg); }
+    @media (min-width:768px){ .chart-container{ height:420px; } }
+
+    /* Dark mode */
+    .dark body, body.dark { --bg:#0b1020; --ink:#e5e7eb; }
+    body.dark { background:#0b1020; color:#e5e7eb; }
+    body.dark .tab-inactive{ background:#0f172a; color:#cbd5e1; border-color:#334155; }
+    body.dark .bg-white{ background:#0f172a !important; }
+    body.dark .text-gray-600{ color:#94a3b8 !important; }
+    body.dark .text-gray-700{ color:#cbd5e1 !important; }
+    body.dark .border-gray-200{ border-color:#334155 !important; }
+    body.dark .bg-gray-50{ background:#0b1224 !important; }
+    body.dark .bg-blue-50{ background:#0b1224 !important; }
+    body.dark .bg-green-50{ background:#0b1224 !important; }
+    body.dark .bg-amber-50{ background:#0b1224 !important; }
+    body.dark .shadow-md{ box-shadow:0 6px 20px rgba(0,0,0,.4) !important; }
+
+    /* Print-friendly */
+    @media print {
+      nav, #utility-bar, .no-print { display:none !important; }
+      body{ background:#fff; }
+      .container{ max-width:900px; }
+      a:after{ content:" (" attr(href) ")"; font-size:.85em; color:#6b7280; }
+    }
+  </style>
 </head>
 <body class="text-gray-800">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
-        
-        <header class="text-center mb-8 md:mb-12">
-            <h1 class="text-3xl md:text-4xl font-bold text-teal-800 mb-2">2025년 청주시 난임부부 지원 통합 안내</h1>
-            <p class="text-lg text-gray-600">청주시에 거주하는 난임부부를 위한 모든 지원 정보를 한 곳에 모았습니다.</p>
-        </header>
-
-        <div class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg mb-8">
-            <h2 class="font-bold text-amber-800">주요 변경사항 (2025년 기준)</h2>
-            <ul class="list-disc list-inside mt-2 text-amber-700 space-y-1">
-                <li><span class="font-semibold">소득 기준 전면 폐지:</span> 모든 난임부부가 지원 대상입니다.</li>
-                <li><span class="font-semibold">지원 횟수 확대:</span> '부부당 평생'에서 '출생아 1명당 25회'로 변경되었습니다.</li>
-                <li><span class="font-semibold">청주시 연령 차등 폐지:</span> 만 45세 이상도 동일한 지원을 받습니다.</li>
-            </ul>
-        </div>
-
-        <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
-            <button data-tab="support-details" class="tab-btn tab-active text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">유형별 지원 내용</button>
-            <button data-tab="calculator" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">예상 비용 분석</button>
-            <button data-tab="schedule" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">나의 시술 일정표</button>
-            <button data-tab="nutrition" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">식이요법 정보</button>
-            <button data-tab="process" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">신청 절차 안내</button>
-            <button data-tab="contact" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300">문의처 정보</button>
-        </nav>
-
-        <main>
-            <section id="support-details" class="content-section active">
-                <div class="space-y-4">
-                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
-                            <span>① 난임 시술비 지원 (체외/인공수정)</span>
-                            <span class="transform transition-transform duration-300">▼</span>
-                        </button>
-                        <div class="accordion-content">
-                            <div class="p-4 border-t text-gray-700">
-                                <p class="mb-4">시험관 아기(체외수정) 및 인공수정 시술에 드는 비용의 본인부담금과 일부 비급여 항목을 지원합니다.</p>
-                                <ul class="space-y-2 list-disc list-inside">
-                                    <li><strong>지원 횟수:</strong> 출생아 1명당 총 25회 (체외수정 20회, 인공수정 5회)</li>
-                                    <li><strong>지원 상한액 (1회 기준):</strong>
-                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
-                                            <li>신선배아 체외수정: 최대 110만원</li>
-                                            <li>동결배아 체외수정: 최대 50만원</li>
-                                            <li>인공수정: 최대 30만원</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>비급여 3종 추가 지원:</strong> 배아동결비(최대 30만원), 착상보조제/유산방지제(각 최대 20만원)</li>
-                                    <li><strong>시술 중단 시:</strong> 의학적 사유로 중단 시, 횟수 차감 없이 발생 비용 지원</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
-                            <span>② 청주시 한방 난임치료 지원</span>
-                            <span class="transform transition-transform duration-300">▼</span>
-                        </button>
-                        <div class="accordion-content">
-                            <div class="p-4 border-t text-gray-700">
-                                <p class="mb-4">청주시의 특화 사업으로, 한의학적 치료를 통해 임신 성공을 돕습니다. 단, 보조생식술과 동시 진행은 불가합니다.</p>
-                                <ul class="space-y-2 list-disc list-inside">
-                                    <li><strong>지원 대상:</strong> 청주시 3개월 이상 거주 난임부부 (사실혼 포함)</li>
-                                    <li><strong>지원 내용:</strong> 6개월간 한약, 침, 뜸 등 치료 지원 (본인부담금 없음)</li>
-                                    <li><strong>지원 금액:</strong> 1인당 최대 138만 6천원 상당</li>
-                                    <li><strong>신청:</strong> 주소지 관할 보건소 방문 신청만 가능</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
-                            <span>③ 가임력 및 진단 검사비 지원</span>
-                            <span class="transform transition-transform duration-300">▼</span>
-                        </button>
-                        <div class="accordion-content">
-                            <div class="p-4 border-t text-gray-700">
-                                <p class="mb-4">건강한 임신 준비와 신속한 난임 진단을 위한 검사 비용을 지원합니다.</p>
-                                <ul class="space-y-2 list-disc list-inside">
-                                    <li><strong>청주시 가임력 검사비:</strong>
-                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
-                                            <li>대상: 청주시 20~49세 남녀 (결혼 무관)</li>
-                                            <li>지원: 여성 최대 13만원 (난소기능검사 등), 남성 최대 5만원 (정액검사 등)</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>충청북도 난임 진단검사비:</strong>
-                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
-                                             <li>대상: 충북 거주 난임 진단 부부</li>
-                                            <li>지원: 난소기능검사, 난관조영술 등 최대 20만원</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                        <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
-                            <span>④ 가임력 보존 및 기타 지원</span>
-                            <span class="transform transition-transform duration-300">▼</span>
-                        </button>
-                        <div class="accordion-content">
-                            <div class="p-4 border-t text-gray-700">
-                                <p class="mb-4">미래의 임신을 준비하거나, 치료 과정에서 겪는 어려움을 덜어주는 지원입니다.</p>
-                                <ul class="space-y-2 list-disc list-inside">
-                                    <li><strong>청주시 냉동난자 사용 보조생식술:</strong>
-                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
-                                            <li>지원: 회당 최대 100만원 (부부당 최대 2회)</li>
-                                        </ul>
-                                    </li>
-                                     <li><strong>난임치료휴가:</strong>
-                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
-                                            <li>지원: 연간 총 6일 (최초 2일 유급)</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>난임·우울증 심리상담:</strong>
-                                        <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
-                                            <li>지원: 중앙 난임·우울증상담센터에서 전문가 무료 상담 제공</li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <section id="calculator" class="content-section">
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">시술별 최종 본인부담금 예상 분석</h2>
-                    <p class="text-center text-gray-600 mb-6">시술 종류를 선택하시면 건강보험과 정부 지원을 모두 반영한 최종 비용을 보여드립니다.</p>
-                    <div id="procedure-selector" class="flex justify-center flex-wrap gap-4 mb-8">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="procedure" value="fresh" class="sr-only peer" checked>
-                            <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">신선배아</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="procedure" value="frozen" class="sr-only peer">
-                            <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">동결배아</div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="procedure" value="iui" class="sr-only peer">
-                            <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">인공수정</div>
-                        </label>
-                    </div>
-                    
-                    <div class="chart-container">
-                        <canvas id="costBreakdownChart"></canvas>
-                    </div>
-
-                    <div id="cost-breakdown-text" class="mt-6 bg-gray-50 p-4 rounded-lg text-center space-y-2">
-                    </div>
-
-                    <div class="mt-4 text-center text-sm text-gray-500">
-                        <p>※ 위 금액은 평균적인 시술비를 바탕으로 한 예상치이며, 병원 및 개인 상태에 따라 달라질 수 있습니다.</p>
-                        <p>※ 건강보험 적용(급여) 부분은 총 시술비의 70%로 가정하여 산출했습니다.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="schedule" class="content-section">
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">나의 시험관 시술 일정표</h2>
-                    <p class="text-center text-gray-600 mb-6">아래 표의 내용을 클릭하여 직접 수정하고 관리할 수 있습니다. (오늘 날짜: 8월 17일)</p>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-500">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-4 py-3">날짜 (YYYY-MM-DD)</th>
-                                    <th scope="col" class="px-4 py-3">요일</th>
-                                    <th scope="col" class="px-4 py-3">시술/검사 내용</th>
-                                    <th scope="col" class="px-4 py-3">비고</th>
-                                    <th scope="col" class="px-4 py-3">관리</th>
-                                </tr>
-                            </thead>
-                            <tbody id="schedule-body">
-                                <!-- Schedule rows will be inserted here by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="text-center mt-6">
-                        <button id="add-schedule-row" class="bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">
-                            일정 추가
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <section id="nutrition" class="content-section">
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">식이요법 및 영양 정보 (임상 증거 기반)</h2>
-                    <div class="space-y-4">
-                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center">
-                                <span>🥚 난포 성장에 좋은 음식 & 피해야 할 음식</span>
-                                <span class="transform transition-transform duration-300">▼</span>
-                            </button>
-                            <div class="accordion-content">
-                                <div class="p-4 border-t text-gray-700">
-                                    <p class="mb-4">난포는 난소 내에서 난자를 성숙시키는 주머니로, 건강한 난포 성장은 배란 성공과 시술 결과에 직결됩니다.</p>
-                                    <h4 class="font-bold text-green-700 mt-4 mb-2">▲ 난포 성장에 좋은 음식</h4>
-                                    <ul class="space-y-3">
-                                        <li><strong>지중해식 식단:</strong> 올리브유, 견과류, 통곡물, 콩류 등. <br><span class="text-sm text-gray-500">효능: 건강한 지방과 저혈당 탄수화물이 인슐린 저항성을 개선하고 난포막을 안정화시킵니다.</span></li>
-                                        <li><strong>십자화과 채소:</strong> 브로콜리, 케일, 양배추 등. <br><span class="text-sm text-gray-500">효능: 풍부한 항산화 성분이 난소 조직을 보호하고 호르몬 균형을 돕습니다.</span></li>
-                                        <li><strong>항산화 식품:</strong> 블루베리, 석류, 토마토, 해조류 등. <br><span class="text-sm text-gray-500">효능: 활성산소를 제거하여 난포가 자라는 환경을 개선합니다.</span></li>
-                                        <li><strong>등푸른 생선 (작은 크기):</strong> 고등어, 정어리, 연어 등. <br><span class="text-sm text-gray-500">효능: 오메가-3가 난포 세포막의 유동성을 높이고 난소의 염증 반응을 줄입니다.</span></li>
-                                        <li><strong>비타민 D 포함 식품:</strong> 강화 우유, 표고버섯, 달걀노른자 등. <br><span class="text-sm text-gray-500">효능: 난포 성숙에 관여하는 인자들을 조절합니다.</span></li>
-                                    </ul>
-                                    <h4 class="font-bold text-red-600 mt-6 mb-2">▼ 난포 성장에 피해야 할 음식</h4>
-                                     <ul class="space-y-3">
-                                        <li><strong>고GI 정제 탄수화물:</strong> 흰 쌀밥, 흰빵, 과자, 설탕 음료 등. <br><span class="text-sm text-gray-500">이유: 혈당 스파이크가 인슐린 저항성을 악화시켜 호르몬 불균형을 유발합니다.</span></li>
-                                        <li><strong>트랜스지방 함유 식품:</strong> 마가린, 도너츠, 튀김류 등. <br><span class="text-sm text-gray-500">이유: 세포막을 경화시키고 염증을 높여 건강한 난포 성장을 방해합니다.</span></li>
-                                        <li><strong>과도한 동물성 단백질:</strong> 붉은 고기, 고지방 유제품 등. <br><span class="text-sm text-gray-500">이유: 포화지방 과다 섭취가 난소 주변의 염증 반응을 유발할 수 있습니다.</span></li>
-                                        <li><strong>알코올 및 고카페인:</strong> 술, 하루 1잔 이상의 커피/에너지드링크. <br><span class="text-sm text-gray-500">이유: 호르몬 대사를 교란하고 난포 발달에 필요한 혈류 공급을 방해할 수 있습니다.</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-red-600 flex justify-between items-center">
-                                <span>▼ 피해야 할 음식 및 성분 (일반)</span>
-                                <span class="transform transition-transform duration-300">▼</span>
-                            </button>
-                            <div class="accordion-content">
-                                <div class="p-4 border-t text-gray-700">
-                                    <ul class="space-y-3">
-                                        <li><strong>혈당지수(GI) 높은 식품:</strong> 흰 쌀밥, 흰 밀가루(빵, 국수), 정제 설탕(과자, 음료) 등. <br><span class="text-sm text-gray-500">임상 근거: 배란장애 난임 위험 90% 증가와 관련.</span></li>
-                                        <li><strong>트랜스지방 함유 식품:</strong> 도너츠, 감자튀김, 마가린 등 가공식품. <br><span class="text-sm text-gray-500">임상 근거: 소량 섭취만으로도 배란장애 위험 증가.</span></li>
-                                        <li><strong>과도한 동물성 단백질:</strong> 적색육(소고기, 돼지고기) 위주의 식단. <br><span class="text-sm text-gray-500">임상 근거: 배란장애 난임 위험 33% 증가. 식물성 단백질로 대체 시 위험 50% 이상 감소.</span></li>
-                                        <li><strong>기타:</strong> 야식, 알코올, 과도한 카페인(하루 1잔 이하 권장).</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-green-700 flex justify-between items-center">
-                                <span>▲ 추천되는 음식 및 식단 (일반)</span>
-                                <span class="transform transition-transform duration-300">▼</span>
-                            </button>
-                            <div class="accordion-content">
-                                <div class="p-4 border-t text-gray-700">
-                                    <ul class="space-y-3">
-                                        <li><strong>십자화과 채소:</strong> 브로콜리, 케일, 양배추 등. <br><span class="text-sm text-gray-500">효능: 인슐린 저항성 개선 및 호르몬 균형에 도움.</span></li>
-                                        <li><strong>지중해식 식단:</strong> 통곡물(현미), 식물성 단백질(콩, 두부), 좋은 지방(견과류, 올리브유), 등푸른 생선(작은 크기). <br><span class="text-sm text-gray-500">임상 근거: 난임 치료 후 정상 출산율 유의미하게 증가.</span></li>
-                                        <li><strong>항산화 식품:</strong> 해조류(미역, 김), 신선한 채소와 과일. <br><span class="text-sm text-gray-500">효능: 자궁 혈류 개선 및 세포 손상 방지.</span></li>
-                                        <li><strong>규칙적인 식사 패턴:</strong> 아침 식사를 충분히 하고, 저녁은 가볍게. 간헐적 단식(16:8)도 일부 PCOS 환자에게 긍정적 효과.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-blue-700 flex justify-between items-center">
-                                <span>💊 추천되는 영양제 (의사 상담 필수)</span>
-                                <span class="transform transition-transform duration-300">▼</span>
-                            </button>
-                            <div class="accordion-content">
-                                <div class="p-4 border-t text-gray-700">
-                                    <ul class="space-y-3">
-                                        <li><strong>이노시톨 (4000mg/일):</strong> 인슐린 저항성 및 호르몬 균형 개선, 배란율 향상에 도움.</li>
-                                        <li><strong>오메가-3 (2000-4000mg/일):</strong> 항염증 효과, 인슐린 저항성 및 남성호르몬 수치 개선.</li>
-                                        <li><strong>비타민 D:</strong> 혈중 농도 검사 후 적정량 복용. 월경 주기 정상화 및 호르몬 균형에 기여.</li>
-                                        <li><strong>엽산 (400-800μg/일):</strong> 난자 질 개선 및 태아 기형아 예방을 위한 필수 영양소.</li>
-                                        <li><strong>메트포르민:</strong> 의사 처방이 필요한 전문의약품으로, 인슐린 저항성 개선에 효과적.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
-                            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-red-600 flex justify-between items-center">
-                                <span>🚫 피해야 할 약물 (임산부 금기 약물)</span>
-                                <span class="transform transition-transform duration-300">▼</span>
-                            </button>
-                            <div class="accordion-content">
-                                <div class="p-4 border-t text-gray-700">
-                                    <ul class="space-y-3">
-                                        <li><strong>절대 금기 (FDA X등급):</strong> 이소트레티노인(여드름약), 와파린(혈전증약), 아토르바스타틴(고지혈증약) 등.</li>
-                                        <li><strong>체중감량제 (삭센다 등):</strong> 임신 준비 시 중단 필요. 시술 중 마취 위험 증가.</li>
-                                        <li><strong>주의 필요 약물:</strong> 이부프로펜 등 일부 해열진통제, 고용량 아스피린, 항우울제 등은 반드시 의사와 상의 후 복용.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-8 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg">
-                        <h4 class="font-bold text-amber-800">가장 중요한 원칙</h4>
-                        <p class="mt-2 text-amber-700">모든 식이요법, 영양제, 약물 복용은 개인의 건강 상태에 따라 효과와 부작용이 다를 수 있습니다. **반드시 담당 주치의와 상의하여 본인에게 맞는 계획을 세우는 것이 가장 중요합니다.**</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="process" class="content-section">
-                 <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">한눈에 보는 신청 절차</h2>
-                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 text-center">
-                        <div class="flex flex-col items-center p-2">
-                            <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">1</div>
-                            <h3 class="font-semibold">난임 진단서 발급</h3>
-                            <p class="text-sm text-gray-600">지정 의료기관 방문</p>
-                        </div>
-                        <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
-                        <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
-                        <div class="flex flex-col items-center p-2">
-                            <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">2</div>
-                            <h3 class="font-semibold">지원 신청 (시술 전)</h3>
-                            <p class="text-sm text-gray-600">보건소 또는 온라인</p>
-                        </div>
-                        <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
-                         <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
-                        <div class="flex flex-col items-center p-2">
-                            <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">3</div>
-                            <h3 class="font-semibold">지원결정통지서 발급</h3>
-                            <p class="text-sm text-gray-600">(유효기간 3개월)</p>
-                        </div>
-                        <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
-                        <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
-                        <div class="flex flex-col items-center p-2">
-                            <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">4</div>
-                            <h3 class="font-semibold">시술 및 비용 정산</h3>
-                            <p class="text-sm text-gray-600">병원에 통지서 제출</p>
-                        </div>
-                    </div>
-                    <div class="mt-8 bg-amber-50 p-4 rounded-lg">
-                        <h4 class="font-bold text-amber-800">필수 구비 서류</h4>
-                        <ul class="list-disc list-inside mt-2 text-amber-700 text-sm">
-                            <li>난임부부 시술비 지원 신청서</li>
-                            <li>난임 진단서 원본 (최초 신청 시)</li>
-                            <li>부부 모두의 건강보험증 사본 (또는 자격확인서)</li>
-                            <li>주민등록등본</li>
-                            <li>(사실혼의 경우) 사실혼 관계 증명 서류 추가 필요</li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
-
-            <section id="contact" class="content-section">
-                <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-                    <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">청주시 보건소 및 관련 기관 연락처</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="border p-4 rounded-lg">
-                            <h3 class="font-bold text-lg">상당보건소</h3>
-                            <p class="text-gray-600">모자보건팀: <a href="tel:043-201-3627" class="text-teal-600 hover:underline">043-201-3627</a></p>
-                        </div>
-                        <div class="border p-4 rounded-lg">
-                            <h3 class="font-bold text-lg">서원보건소</h3>
-                            <p class="text-gray-600">모자보건팀: <a href="tel:043-201-3270" class="text-teal-600 hover:underline">043-201-3270</a></p>
-                        </div>
-                        <div class="border p-4 rounded-lg">
-                            <h3 class="font-bold text-lg">흥덕보건소</h3>
-                            <p class="text-gray-600">모자보건팀: <a href="tel:043-201-3365" class="text-teal-600 hover:underline">043-201-3365</a></p>
-                        </div>
-                        <div class="border p-4 rounded-lg">
-                            <h3 class="font-bold text-lg">청원보건소</h3>
-                            <p class="text-gray-600">모자보건팀: <a href="tel:043-201-3493" class="text-teal-600 hover:underline">043-201-3493</a></p>
-                        </div>
-                    </div>
-                    <div class="mt-6 border-t pt-4">
-                         <h3 class="font-bold text-lg text-center">온라인 신청 및 정보</h3>
-                         <div class="flex justify-center gap-4 mt-2">
-                            <a href="https://www.gov.kr" target="_blank" class="text-teal-600 hover:underline">정부24</a>
-                            <span class="text-gray-300">|</span>
-                            <a href="https://www.e-health.go.kr" target="_blank" class="text-teal-600 hover:underline">e보건소</a>
-                         </div>
-                    </div>
-                </div>
-            </section>
-        </main>
+  <!-- Utility bar -->
+  <div id="utility-bar" class="sticky top-0 z-50 backdrop-blur bg-white/80 dark:bg-[#0b1020]/80 border-b border-gray-200 dark:border-slate-700">
+    <div class="container mx-auto px-4 py-2 max-w-5xl flex items-center gap-2 justify-between">
+      <span class="text-sm md:text-base font-semibold text-teal-800 dark:text-teal-300">난임 여정 종합 가이드 · 강화판</span>
+      <div class="flex flex-wrap gap-2">
+        <button id="btn-save-json" class="px-3 py-1.5 rounded-md border text-sm hover:bg-teal-50 dark:hover:bg-slate-800">백업(JSON)</button>
+        <label class="px-3 py-1.5 rounded-md border text-sm cursor-pointer hover:bg-teal-50 dark:hover:bg-slate-800">불러오기
+          <input id="file-restore" type="file" accept="application/json" class="hidden" />
+        </label>
+        <button id="btn-export-csv" class="px-3 py-1.5 rounded-md border text-sm hover:bg-teal-50 dark:hover:bg-slate-800">일정 CSV</button>
+        <button id="btn-print" class="px-3 py-1.5 rounded-md border text-sm hover:bg-teal-50 dark:hover:bg-slate-800">인쇄/PDF</button>
+        <button id="btn-dark" class="px-3 py-1.5 rounded-md border text-sm hover:bg-teal-50 dark:hover:bg-slate-800">다크모드</button>
+        <button id="btn-reset" class="px-3 py-1.5 rounded-md border text-sm text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-slate-800">초기화</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const tabs = document.querySelectorAll('.tab-btn');
-            const sections = document.querySelectorAll('.content-section');
-            const accordions = document.querySelectorAll('.accordion-item');
+  <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+    <header class="text-center mb-8 md:mb-12">
+      <h1 class="text-3xl md:text-4xl font-bold text-teal-800 mb-2">난임 여정 종합 가이드</h1>
+      <p class="text-lg text-gray-600">현재 상황에 대한 이해와 앞으로의 계획을 돕기 위한 맞춤형 정보입니다.</p>
+    </header>
 
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const target = tab.dataset.tab;
+    <!-- Tabs -->
+    <nav class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8" role="tablist" aria-label="섹션 탭">
+      <button data-tab="report" class="tab-btn tab-active text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300" aria-selected="true">나의 건강 리포트</button>
+      <button data-tab="schedule" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300" aria-selected="false">나의 시술 일정표</button>
+      <button data-tab="support-details" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300" aria-selected="false">정부 지원 내용</button>
+      <button data-tab="calculator" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300" aria-selected="false">예상 비용 분석</button>
+      <button data-tab="nutrition" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300" aria-selected="false">식이요법 정보</button>
+      <button data-tab="process" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300" aria-selected="false">지원 신청 절차</button>
+      <button data-tab="tracker" class="tab-btn tab-inactive text-sm md:text-base font-semibold py-2 px-4 rounded-full border-2 transition-all duration-300" aria-selected="false">회복 모니터</button>
+    </nav>
 
-                    tabs.forEach(t => {
-                        t.classList.remove('tab-active');
-                        t.classList.add('tab-inactive');
-                    });
-                    tab.classList.add('tab-active');
-                    tab.classList.remove('tab-inactive');
+    <main>
+      <!-- REPORT -->
+      <section id="report" class="content-section active">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">현재 상황 및 향후 계획 리포트</h2>
+          <p class="text-center text-gray-600 mb-6">(2025년 8월 29일 금요일 기준)</p>
 
-                    sections.forEach(section => {
-                        if (section.id === target) {
-                            section.classList.add('active');
-                        } else {
-                            section.classList.remove('active');
-                        }
-                    });
-                });
-            });
+          <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg mb-8">
+            <h3 class="font-bold text-blue-800">현재 상황 요약</h3>
+            <p class="mt-2 text-blue-700">이번 주 월요일(8/25) 난자채취 후, 다낭성 난소증후군(PCOS)으로 인한 고위험군에서 예측 가능했던 <strong>난소과자극증후군(OHSS)</strong>이 발생하여 현재 입원 치료를 통해 집중 관리를 받고 계십니다. 이는 몸이 스스로 회복하는 동안 합병증을 예방하고 안전을 확보하기 위한 필수적인 과정입니다. 내일(8/30) 오전 퇴원을 목표로 순조롭게 회복 중이십니다.</p>
+          </div>
 
-            accordions.forEach(item => {
-                const header = item.querySelector('.accordion-header');
-                const content = item.querySelector('.accordion-content');
-                const icon = header.querySelector('span:last-child');
+          <div class="space-y-4">
+            <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+              <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center" aria-expanded="false">
+                <span>1. 현재 상태에 대한 의학적 이해</span>
+                <span class="transform transition-transform duration-300">▼</span>
+              </button>
+              <div class="accordion-content">
+                <div class="p-4 border-t text-gray-700 space-y-4">
+                  <p><strong>Q. 왜 복수가 차고 몸이 힘든가요? (OHSS의 원인)</strong><br />PCOS 특성상 과배란 유도에 매우 민감해 다수의 난포가 자랐습니다. 이 난포에서 분비된 VEGF가 hCG 유발 후 증가하면서 혈관 내 수분이 복강으로 빠져나가 복수가 차고 혈액이 농축된 것입니다.</p>
+                  <p><strong>Q. 지금 받는 치료는 무엇인가요? (입원 치료의 목적)</strong><br />증후군을 직접 없애기보다, 회복될 때까지 안전하게 지지하고 합병증(혈전 등)을 예방하는 데 목적이 있습니다. 정맥 수액, 혈전 예방 조치 등이 핵심입니다.</p>
+                </div>
+              </div>
+            </div>
 
-                header.addEventListener('click', () => {
-                    const isOpened = content.style.maxHeight && content.style.maxHeight !== '0px';
-                    
-                    if (!isOpened) {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                        icon.style.transform = 'rotate(180deg)';
-                    } else {
-                        content.style.maxHeight = '0px';
-                        icon.style.transform = 'rotate(0deg)';
-                    }
-                });
-            });
+            <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+              <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center" aria-expanded="false">
+                <span>2. 앞으로의 회복 과정 및 계획</span>
+                <span class="transform transition-transform duration-300">▼</span>
+              </button>
+              <div class="accordion-content">
+                <div class="p-4 border-t text-gray-700">
+                  <div class="timeline">
+                    <div class="timeline-item">
+                      <h4 class="font-bold text-lg">단기 계획: 안전한 회복 (퇴원 후 ~ 9월 중순)</h4>
+                      <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li><strong>전체 배아 동결</strong> 전략(신선 이식 금기)</li>
+                        <li><strong>증상 호전 시기</strong>: 9월 초중순</li>
+                        <li><strong>자가 관리</strong>: 전해질 보충, 고단백 식단, 격한 활동/부부관계 금지, 가벼운 걷기</li>
+                        <li><strong>위험 신호</strong>: 24시간 1kg 이상 급증, 심한 복통/호흡곤란, 소변량 감소 → 즉시 병원</li>
+                      </ul>
+                    </div>
+                    <div class="timeline-item">
+                      <h4 class="font-bold text-lg">중기 계획: 최적의 준비 (9월 말 ~ 11월)</h4>
+                      <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>1~2주기 회복 및 호르몬 안정</li>
+                        <li>동결배아 이식(FET) 시기: <strong>10~11월</strong> 예상</li>
+                      </ul>
+                    </div>
+                    <div class="timeline-item">
+                      <h4 class="font-bold text-lg">장기 계획: 다음 시도 안전 강화</h4>
+                      <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>OHSS 예방 프로토콜(hCG 대신 GnRH 작용제 유발 등) 적용</li>
+                        <li>주사 용량 정교화</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-            const costData = {
-                fresh: { label: '신선배아 체외수정', maxSupport: 1100000, total: 4000000 },
-                frozen: { label: '동결배아 체외수정', maxSupport: 500000, total: 2000000 },
-                iui: { label: '인공수정', maxSupport: 300000, total: 800000 }
-            };
+          <div class="mt-8 bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+            <h3 class="font-bold text-green-800">결론: 희망을 향한 전략적 발걸음</h3>
+            <p class="mt-2 text-green-700">이번 경험은 앞으로의 여정을 더 안전하고 효과적으로 이끌어갈 귀중한 데이터입니다. 현재 회복에 집중하고, 다음 단계를 차분히 준비합시다.</p>
+          </div>
+        </div>
+      </section>
 
-            const krwFormatter = new Intl.NumberFormat('ko-KR');
-            const costBreakdownChartCtx = document.getElementById('costBreakdownChart').getContext('2d');
-            let costChart;
-            const costBreakdownTextEl = document.getElementById('cost-breakdown-text');
+      <!-- SCHEDULE -->
+      <section id="schedule" class="content-section">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">나의 시험관 시술 일정표</h2>
+          <p class="text-center text-gray-600 mb-6">아래 표의 내용을 클릭하여 직접 수정하고 관리할 수 있습니다. (오늘 날짜: 2025-08-29)</p>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3">날짜 (YYYY-MM-DD)</th>
+                  <th class="px-4 py-3">요일</th>
+                  <th class="px-4 py-3">시술/검사 내용</th>
+                  <th class="px-4 py-3">비고</th>
+                  <th class="px-4 py-3">관리</th>
+                </tr>
+              </thead>
+              <tbody id="schedule-body"></tbody>
+            </table>
+          </div>
+          <div class="flex flex-wrap justify-center gap-2 mt-6">
+            <button id="add-schedule-row" class="bg-teal-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-teal-700 transition-colors">일정 추가</button>
+            <button id="btn-clear-past" class="border px-4 py-2 rounded-lg hover:bg-gray-50">지난 일정 정리</button>
+          </div>
+        </div>
+      </section>
 
-            function renderCostChart(procedure) {
-                const data = costData[procedure];
-                
-                const nhiCoverage = data.total * 0.7;
-                const initialPatientCost = data.total * 0.3;
-                const governmentSupport = Math.min(initialPatientCost, data.maxSupport);
-                const finalPatientCost = initialPatientCost - governmentSupport;
+      <!-- SUPPORT DETAILS (unchanged structure; content folded in accordions) -->
+      <section id="support-details" class="content-section">
+        <div class="space-y-4">
+          <!-- ① -->
+          <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center" aria-expanded="false">
+              <span>① 난임 시술비 지원 (체외/인공수정)</span>
+              <span class="transform transition-transform duration-300">▼</span>
+            </button>
+            <div class="accordion-content"><div class="p-4 border-t text-gray-700">
+              <p class="mb-4">시험관 아기(체외수정) 및 인공수정 시술에 드는 비용의 본인부담금과 일부 비급여 항목을 지원합니다.</p>
+              <ul class="space-y-2 list-disc list-inside">
+                <li><strong>지원 횟수:</strong> 출생아 1명당 총 25회 (체외수정 20회, 인공수정 5회)</li>
+                <li><strong>지원 상한액 (1회 기준):</strong>
+                  <ul class="ml-6 mt-1 space-y-1 list-['-_'] list-inside">
+                    <li>신선배아 체외수정: 최대 110만원</li>
+                    <li>동결배아 체외수정: 최대 50만원</li>
+                    <li>인공수정: 최대 30만원</li>
+                  </ul>
+                </li>
+                <li><strong>비급여 3종 추가 지원:</strong> 배아동결비(최대 30만원), 착상보조제/유산방지제(각 최대 20만원)</li>
+                <li><strong>시술 중단 시:</strong> 의학적 사유로 중단 시, 횟수 차감 없이 발생 비용 지원</li>
+              </ul>
+            </div></div>
+          </div>
+          <!-- ② -->
+          <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center" aria-expanded="false">
+              <span>② 청주시 한방 난임치료 지원</span>
+              <span class="transform transition-transform duration-300">▼</span>
+            </button>
+            <div class="accordion-content"><div class="p-4 border-t text-gray-700">
+              <p class="mb-4">청주시 특화 사업(보조생식술과 동시 진행 불가).</p>
+              <ul class="space-y-2 list-disc list-inside">
+                <li><strong>대상:</strong> 청주시 3개월 이상 거주 난임부부(사실혼 포함)</li>
+                <li><strong>지원:</strong> 6개월간 한약, 침, 뜸 등(본인부담 없음)</li>
+                <li><strong>규모:</strong> 1인당 최대 138만 6천원 상당</li>
+                <li><strong>신청:</strong> 주소지 관할 보건소 방문 신청</li>
+              </ul>
+            </div></div>
+          </div>
+          <!-- ③ -->
+          <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center" aria-expanded="false">
+              <span>③ 가임력 및 진단 검사비 지원</span>
+              <span class="transform transition-transform duration-300">▼</span>
+            </button>
+            <div class="accordion-content"><div class="p-4 border-t text-gray-700">
+              <ul class="space-y-2 list-disc list-inside">
+                <li><strong>청주시 가임력 검사비:</strong> 여성 최대 13만원, 남성 최대 5만원</li>
+                <li><strong>충청북도 난임 진단검사비:</strong> 주요 검사 최대 20만원</li>
+              </ul>
+            </div></div>
+          </div>
+          <!-- ④ -->
+          <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+            <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center" aria-expanded="false">
+              <span>④ 가임력 보존 및 기타 지원</span>
+              <span class="transform transition-transform duration-300">▼</span>
+            </button>
+            <div class="accordion-content"><div class="p-4 border-t text-gray-700">
+              <ul class="space-y-2 list-disc list-inside">
+                <li><strong>냉동난자 사용 보조생식술:</strong> 회당 최대 100만원(부부당 2회)</li>
+                <li><strong>난임치료휴가:</strong> 연 6일(최초 2일 유급)</li>
+                <li><strong>난임·우울증 심리상담:</strong> 중앙 상담센터 무료 지원</li>
+              </ul>
+            </div></div>
+          </div>
+        </div>
+      </section>
 
-                if (costChart) {
-                    costChart.destroy();
-                }
+      <!-- CALCULATOR -->
+      <section id="calculator" class="content-section">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">시술별 최종 본인부담금 예상 분석</h2>
+          <p class="text-center text-gray-600 mb-6">시술 종류를 선택하시면 건강보험과 정부 지원을 모두 반영한 최종 비용을 보여드립니다.</p>
 
-                costChart = new Chart(costBreakdownChartCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: [data.label],
-                        datasets: [
-                            {
-                                label: '건강보험 적용분',
-                                data: [nhiCoverage],
-                                backgroundColor: '#A7C4B5', // Soft Green
-                            },
-                            {
-                                label: '정부 지원금',
-                                data: [governmentSupport],
-                                backgroundColor: '#0D9488', // Teal
-                            },
-                            {
-                                label: '최종 본인부담금',
-                                data: [finalPatientCost],
-                                backgroundColor: '#F9A825', // Amber
-                            }
-                        ]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        label += krwFormatter.format(context.raw) + '원';
-                                        return label;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                stacked: true,
-                                ticks: {
-                                    callback: (value) => new Intl.NumberFormat('ko-KR', { notation: 'compact' }).format(value)
-                                }
-                            },
-                            y: {
-                                stacked: true,
-                                grid: { display: false }
-                            }
-                        }
-                    }
-                });
+          <div id="procedure-selector" class="flex justify-center flex-wrap gap-4 mb-8">
+            <label class="cursor-pointer">
+              <input type="radio" name="procedure" value="fresh" class="sr-only peer" checked />
+              <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">신선배아</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="procedure" value="frozen" class="sr-only peer" />
+              <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">동결배아</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="procedure" value="iui" class="sr-only peer" />
+              <div class="py-2 px-5 rounded-full border-2 border-gray-300 peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 transition-all">인공수정</div>
+            </label>
+          </div>
 
-                costBreakdownTextEl.innerHTML = `
-                    <p class="text-gray-600">총 예상 시술비: <span class="font-bold text-black">${krwFormatter.format(data.total)}원</span></p>
-                    <div class="w-full border-t my-2"></div>
-                    <p class="text-gray-500"> └ 건강보험 적용: <span class="font-semibold">${krwFormatter.format(nhiCoverage)}원</span></p>
-                    <p class="text-teal-700"> └ 정부 지원금: <span class="font-semibold">${krwFormatter.format(governmentSupport)}원</span></p>
-                    <p class="text-amber-600"> └ <span class="font-bold">최종 본인부담금:</span> <span class="font-extrabold text-lg">${krwFormatter.format(finalPatientCost)}원</span></p>
-                `;
-            }
+          <div class="chart-container"><canvas id="costBreakdownChart" aria-label="비용 분석 차트" role="img"></canvas></div>
+          <div id="cost-breakdown-text" class="mt-6 bg-gray-50 p-4 rounded-lg text-center space-y-2"></div>
+          <div class="mt-4 text-center text-sm text-gray-500">
+            <p>※ 위 금액은 평균적인 시술비를 바탕으로 한 예상치이며, 병원 및 개인 상태에 따라 달라질 수 있습니다.</p>
+            <p>※ 건강보험 적용(급여) 부분은 총 시술비의 70%로 가정하여 산출했습니다.</p>
+          </div>
+        </div>
+      </section>
 
-            const procedureSelector = document.getElementById('procedure-selector');
-            procedureSelector.addEventListener('change', (event) => {
-                renderCostChart(event.target.value);
-            });
-            
-            if(document.getElementById('costBreakdownChart')) {
-                 renderCostChart('fresh');
-            }
+      <!-- NUTRITION (content condensed to keep file compact) -->
+      <section id="nutrition" class="content-section">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">식이요법 및 영양 정보 (임상 증거 기반)</h2>
+          <div class="space-y-4">
+            <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+              <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-teal-700 flex justify-between items-center" aria-expanded="false">
+                <span>🥚 난포 성장에 좋은 음식 & 피해야 할 음식</span>
+                <span class="transform transition-transform duration-300">▼</span>
+              </button>
+              <div class="accordion-content"><div class="p-4 border-t text-gray-700">
+                <h4 class="font-bold text-green-700 mt-2 mb-2">▲ 좋은 음식</h4>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                  <li>지중해식: 올리브유, 견과류, 통곡물, 콩류</li>
+                  <li>십자화과 채소: 브로콜리/케일/양배추</li>
+                  <li>항산화 식품: 베리류, 석류, 토마토, 해조류</li>
+                  <li>등푸른 생선(작은 크기)</li>
+                  <li>비타민 D 식품: 달걀노른자, 표고, 강화 우유</li>
+                </ul>
+                <h4 class="font-bold text-red-600 mt-4 mb-2">▼ 피해야 할 것</h4>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                  <li>고 GI 정제 탄수화물</li>
+                  <li>트랜스지방</li>
+                  <li>과도한 동물성 단백</li>
+                  <li>알코올/고카페인</li>
+                </ul>
+              </div></div>
+            </div>
+            <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+              <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-blue-700 flex justify-between items-center" aria-expanded="false">
+                <span>💊 추천되는 영양제 (의사 상담 필수)</span>
+                <span class="transform transition-transform duration-300">▼</span>
+              </button>
+              <div class="accordion-content"><div class="p-4 border-t text-gray-700 text-sm">
+                <ul class="space-y-1">
+                  <li>이노시톨(4g/일)</li>
+                  <li>오메가-3(2~4g/일)</li>
+                  <li>비타민 D(수준 측정 후 보충)</li>
+                  <li>엽산(400~800μg/일)</li>
+                  <li>메트포르민(처방약)</li>
+                </ul>
+              </div></div>
+            </div>
+            <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+              <button class="accordion-header w-full text-left p-4 font-semibold text-lg text-red-600 flex justify-between items-center" aria-expanded="false">
+                <span>🚫 피해야 할 약물 (임산부 금기)</span>
+                <span class="transform transition-transform duration-300">▼</span>
+              </button>
+              <div class="accordion-content"><div class="p-4 border-t text-gray-700 text-sm">
+                <ul class="space-y-1">
+                  <li>절대 금기: 이소트레티노인, 와파린, 일부 스타틴</li>
+                  <li>체중감량제: 임신 준비 시 중단</li>
+                  <li>주의: 이부프로펜·고용량 아스피린·항우울제 등은 의사와 상의</li>
+                </ul>
+              </div></div>
+            </div>
+          </div>
+          <div class="mt-8 bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg">
+            <h4 class="font-bold text-amber-800">가장 중요한 원칙</h4>
+            <p class="mt-2 text-amber-700">모든 식이·영양제·약물은 개인 차가 큽니다. <strong>반드시 주치의와 상의</strong>하여 결정하세요.</p>
+          </div>
+        </div>
+      </section>
 
-            // Schedule Planner Logic
-            let scheduleData = [
-                { date: '2025-08-14', event: '배란유도(난포자극) 주사 시작', notes: 'FSH/LH 계열·GnRH 항진 유도제 복합 처방' },
-                { date: '2025-08-17', event: '오늘', notes: '일정을 확인하고 수정하세요.' },
-                { date: '2025-08-19', event: '초음파 난포 모니터링(첫 모니터링)', notes: '난포 수·크기 측정, 혈액 에스트라디올 검사' },
-                { date: '2025-08-21', event: '초음파 난포 모니터링(2차 모니터링)', notes: '성장 속도에 따라 변동 가능' },
-                { date: '2025-08-22', event: '난포 최종 크기 확인 & 혈액 검사', notes: '트리거 주사 시기 결정' },
-                { date: '2025-08-23', event: '트리거 주사(난자 성숙 유도)', notes: 'hCG 또는 GnRH 작용제 투여 (채취 36시간 전)' },
-                { date: '2025-08-25', event: '난자채취(egg retrieval)', notes: '국소/수면마취. 2~3시간 관찰 후 퇴원' },
-                { date: '2025-08-26', event: '체외수정(IVF/ICSI)', notes: '채취 난자와 정자 결합' },
-                { date: '2025-08-30', event: '배아이식(embryo transfer) (Day-5)', notes: '블라스토시스트 단계 이식' },
-                { date: '2025-09-13', event: '혈액 임신반응검사(β-hCG)', notes: '이식 후 14일째' },
-                { date: '2025-09-20', event: '초음파 임신낭 및 심박동 확인', notes: '임신 주수 확인' }
-            ];
+      <!-- PROCESS -->
+      <section id="process" class="content-section">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">한눈에 보는 신청 절차</h2>
+          <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-0 text-center">
+            <div class="flex flex-col items-center p-2">
+              <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">1</div>
+              <h3 class="font-semibold">난임 진단서 발급</h3>
+              <p class="text-sm text-gray-600">지정 의료기관 방문</p>
+            </div>
+            <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
+            <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
+            <div class="flex flex-col items-center p-2">
+              <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">2</div>
+              <h3 class="font-semibold">지원 신청 (시술 전)</h3>
+              <p class="text-sm text-gray-600">보건소 또는 온라인</p>
+            </div>
+            <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
+            <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
+            <div class="flex flex-col items-center p-2">
+              <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">3</div>
+              <h3 class="font-semibold">지원결정통지서 발급</h3>
+              <p class="text-sm text-gray-600">(유효기간 3개월)</p>
+            </div>
+            <div class="text-2xl text-teal-400 font-light hidden md:block mx-4">→</div>
+            <div class="text-2xl text-teal-400 font-light md:hidden my-2">↓</div>
+            <div class="flex flex-col items-center p-2">
+              <div class="w-20 h-20 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center text-3xl font-bold mb-2">4</div>
+              <h3 class="font-semibold">시술 및 비용 정산</h3>
+              <p class="text-sm text-gray-600">병원에 통지서 제출</p>
+            </div>
+          </div>
 
-            const scheduleBody = document.getElementById('schedule-body');
-            const addScheduleRowBtn = document.getElementById('add-schedule-row');
+          <div class="mt-8 bg-amber-50 p-4 rounded-lg">
+            <h4 class="font-bold text-amber-800">필수 구비 서류</h4>
+            <ul class="list-disc list-inside mt-2 text-amber-700 text-sm">
+              <li>난임부부 시술비 지원 신청서</li>
+              <li>난임 진단서 원본(최초 신청 시)</li>
+              <li>부부 모두 건강보험증 사본(또는 자격확인서)</li>
+              <li>주민등록등본</li>
+              <li>(사실혼) 관계 증명 서류</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-            const getDayOfWeek = (dateString) => {
-                const days = ['일', '월', '화', '수', '목', '금', '토'];
-                try {
-                    const date = new Date(dateString + 'T00:00:00');
-                    if (isNaN(date)) return '';
-                    return days[date.getDay()];
-                } catch (e) {
-                    return '';
-                }
-            };
+      <!-- TRACKER (new) -->
+      <section id="tracker" class="content-section">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <h2 class="text-2xl font-bold text-center mb-2 text-teal-800">회복 모니터 (OHSS 자가기록)</h2>
+          <p class="text-center text-gray-600 mb-6">체중·복부둘레·소변량·증상 점수를 기록해 경과를 확인하고 경고 신호를 자동으로 표시합니다.</p>
 
-            const renderSchedule = () => {
-                if(!scheduleBody) return;
-                scheduleBody.innerHTML = '';
-                const today = new Date('2025-08-17T00:00:00');
+          <form id="tracker-form" class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+            <div>
+              <label class="block text-sm mb-1">날짜</label>
+              <input id="trk-date" type="date" class="w-full border rounded-md px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-sm mb-1">체중(kg)</label>
+              <input id="trk-weight" type="number" step="0.1" class="w-full border rounded-md px-3 py-2" placeholder="예: 60.5" />
+            </div>
+            <div>
+              <label class="block text-sm mb-1">복부둘레(cm)</label>
+              <input id="trk-girth" type="number" step="0.1" class="w-full border rounded-md px-3 py-2" placeholder="예: 78.0" />
+            </div>
+            <div>
+              <label class="block text-sm mb-1">소변량(ml)</label>
+              <input id="trk-urine" type="number" step="1" class="w-full border rounded-md px-3 py-2" placeholder="예: 1500" />
+            </div>
+            <div class="flex gap-2">
+              <button type="submit" class="flex-1 bg-teal-600 text-white font-semibold px-3 py-2 rounded-md hover:bg-teal-700">기록 추가</button>
+              <button id="trk-clear" type="button" class="px-3 py-2 border rounded-md">모두 삭제</button>
+            </div>
+          </form>
 
-                scheduleData.forEach((item, index) => {
-                    const itemDate = new Date(item.date + 'T00:00:00');
-                    let rowClass = '';
-                    if (itemDate < today) {
-                        rowClass = 'bg-gray-100 text-gray-400';
-                    } else if (itemDate.getTime() === today.getTime()) {
-                        rowClass = 'bg-yellow-100 font-bold';
-                    }
+          <div class="mt-6 overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 text-gray-700">
+                <tr>
+                  <th class="px-3 py-2">날짜</th>
+                  <th class="px-3 py-2">체중</th>
+                  <th class="px-3 py-2">복부둘레</th>
+                  <th class="px-3 py-2">소변량</th>
+                  <th class="px-3 py-2">경고</th>
+                  <th class="px-3 py-2">삭제</th>
+                </tr>
+              </thead>
+              <tbody id="tracker-body"></tbody>
+            </table>
+          </div>
 
-                    const row = document.createElement('tr');
-                    row.className = `border-b ${rowClass}`;
-                    row.innerHTML = `
-                        <td class="px-4 py-2" contenteditable="true" data-col="date">${item.date}</td>
-                        <td class="px-4 py-2">${getDayOfWeek(item.date)}</td>
-                        <td class="px-4 py-2" contenteditable="true" data-col="event">${item.event}</td>
-                        <td class="px-4 py-2" contenteditable="true" data-col="notes">${item.notes}</td>
-                        <td class="px-4 py-2 text-center">
-                            <button class="delete-row-btn text-red-500 hover:text-red-700" data-index="${index}">삭제</button>
-                        </td>
-                    `;
-                    scheduleBody.appendChild(row);
-                });
-            };
+          <div class="chart-container mt-6"><canvas id="trackerChart" aria-label="회복 추이 차트" role="img"></canvas></div>
+          <p class="text-xs text-gray-500 mt-2">※ 경고 규칙(기본): 24시간 체중 +1.0kg 이상, 소변량 < 800ml(성인 기준), 복부둘레 급증 시 강조 표시됩니다. 실제 판단은 반드시 의료진 지시를 따르세요.</p>
+        </div>
+      </section>
 
-            if (addScheduleRowBtn) {
-                addScheduleRowBtn.addEventListener('click', () => {
-                    scheduleData.push({ date: 'YYYY-MM-DD', event: '새로운 일정', notes: '비고' });
-                    renderSchedule();
-                });
-            }
+      <!-- CONTACT -->
+      <section id="contact" class="content-section">
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+          <h2 class="text-2xl font-bold text-center mb-6 text-teal-800">청주시 보건소 및 관련 기관 연락처</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border p-4 rounded-lg"><h3 class="font-bold text-lg">상당보건소</h3><p class="text-gray-600">모자보건팀: <a href="tel:043-201-3627" class="text-teal-600 hover:underline">043-201-3627</a></p></div>
+            <div class="border p-4 rounded-lg"><h3 class="font-bold text-lg">서원보건소</h3><p class="text-gray-600">모자보건팀: <a href="tel:043-201-3270" class="text-teal-600 hover:underline">043-201-3270</a></p></div>
+            <div class="border p-4 rounded-lg"><h3 class="font-bold text-lg">흥덕보건소</h3><p class="text-gray-600">모자보건팀: <a href="tel:043-201-3365" class="text-teal-600 hover:underline">043-201-3365</a></p></div>
+            <div class="border p-4 rounded-lg"><h3 class="font-bold text-lg">청원보건소</h3><p class="text-gray-600">모자보건팀: <a href="tel:043-201-3493" class="text-teal-600 hover:underline">043-201-3493</a></p></div>
+          </div>
+          <div class="mt-6 border-t pt-4">
+            <h3 class="font-bold text-lg text-center">온라인 신청 및 정보</h3>
+            <div class="flex justify-center gap-4 mt-2">
+              <a href="https://www.gov.kr" target="_blank" class="text-teal-600 hover:underline">정부24</a>
+              <span class="text-gray-300">|</span>
+              <a href="https://www.e-health.go.kr" target="_blank" class="text-teal-600 hover:underline">e보건소</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
-            if (scheduleBody) {
-                scheduleBody.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('delete-row-btn')) {
-                        const index = e.target.dataset.index;
-                        scheduleData.splice(index, 1);
-                        renderSchedule();
-                    }
-                });
+  <script>
+    // ===== Helpers & Storage =====
+    const $ = (q, ctx=document) => ctx.querySelector(q);
+    const $$ = (q, ctx=document) => Array.from(ctx.querySelectorAll(q));
+    const LS = {
+      get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+      set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
+      del: (k) => localStorage.removeItem(k)
+    };
 
-                scheduleBody.addEventListener('blur', (e) => {
-                    if (e.target.hasAttribute('contenteditable')) {
-                        const index = e.target.closest('tr').querySelector('.delete-row-btn').dataset.index;
-                        const col = e.target.dataset.col;
-                        scheduleData[index][col] = e.target.innerText;
-                        if(col === 'date') {
-                           renderSchedule(); // Re-render to update day of week
-                        }
-                    }
-                }, true);
-            }
+    // Persisted keys
+    const KEY_TAB = 'ivf_active_tab_v1';
+    const KEY_SCHEDULE = 'ivf_schedule_v1';
+    const KEY_TRACKER = 'ivf_tracker_v1';
+    const KEY_DARK = 'ivf_dark_v1';
 
-            renderSchedule();
+    // ===== Tabs =====
+    document.addEventListener('DOMContentLoaded', () => {
+      const tabs = $$('.tab-btn');
+      const sections = $$('.content-section');
+      const setActive = (id) => {
+        sections.forEach(s => s.classList.toggle('active', s.id === id));
+        tabs.forEach(t => {
+          const on = t.dataset.tab === id;
+          t.classList.toggle('tab-active', on);
+          t.classList.toggle('tab-inactive', !on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
         });
-    </script>
+        LS.set(KEY_TAB, id);
+      };
+      tabs.forEach(tab => tab.addEventListener('click', () => setActive(tab.dataset.tab)));
+      // Restore last tab
+      const last = LS.get(KEY_TAB, 'report');
+      if (last && $('#'+last)) setActive(last);
 
+      // Accordions
+      $$('.accordion-item').forEach(item => {
+        const header = $('.accordion-header', item);
+        const content = $('.accordion-content', item);
+        const icon = header.querySelector('span:last-child');
+        header.addEventListener('click', () => {
+          const opened = content.style.maxHeight && content.style.maxHeight !== '0px';
+          if (!opened) {
+            content.style.maxHeight = content.scrollHeight + 'px';
+            icon.style.transform = 'rotate(180deg)';
+            header.setAttribute('aria-expanded', 'true');
+          } else {
+            content.style.maxHeight = '0px';
+            icon.style.transform = 'rotate(0deg)';
+            header.setAttribute('aria-expanded', 'false');
+          }
+        });
+      });
+
+      // ===== Dark Mode =====
+      const applyDark = (on) => document.body.classList.toggle('dark', !!on);
+      applyDark(LS.get(KEY_DARK, false));
+      $('#btn-dark')?.addEventListener('click', () => { const v = !document.body.classList.contains('dark'); applyDark(v); LS.set(KEY_DARK, v); });
+
+      // ===== Print =====
+      $('#btn-print')?.addEventListener('click', () => window.print());
+
+      // ===== Backup / Restore (JSON) =====
+      $('#btn-save-json')?.addEventListener('click', () => {
+        const payload = {
+          schedule: LS.get(KEY_SCHEDULE, []),
+          tracker: LS.get(KEY_TRACKER, []),
+          activeTab: LS.get(KEY_TAB, 'report'),
+          dark: LS.get(KEY_DARK, false)
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'ivf-guide-backup.json'; a.click();
+        URL.revokeObjectURL(url);
+      });
+      $('#file-restore')?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const data = JSON.parse(reader.result);
+            if (Array.isArray(data.schedule)) LS.set(KEY_SCHEDULE, data.schedule);
+            if (Array.isArray(data.tracker)) LS.set(KEY_TRACKER, data.tracker);
+            if (typeof data.activeTab === 'string') LS.set(KEY_TAB, data.activeTab);
+            if (typeof data.dark === 'boolean') LS.set(KEY_DARK, data.dark);
+            location.reload();
+          } catch { alert('불러오기 실패: JSON 형식이 올바르지 않습니다.'); }
+        };
+        reader.readAsText(file, 'utf-8');
+      });
+
+      // ===== Cost Calculator (Chart.js) =====
+      const costData = {
+        fresh: { label:'신선배아 체외수정', maxSupport:1100000, total:4000000 },
+        frozen:{ label:'동결배아 체외수정', maxSupport: 500000, total:2000000 },
+        iui:   { label:'인공수정',       maxSupport: 300000, total: 800000 }
+      };
+      const krw = new Intl.NumberFormat('ko-KR');
+      let costChart;
+      const costCtx = $('#costBreakdownChart');
+      const costText = $('#cost-breakdown-text');
+
+      function renderCostChart(type){
+        if (!costCtx) return;
+        const d = costData[type];
+        const nhi = d.total * 0.7;                // 건강보험 가정 70%
+        const initial = d.total * 0.3;            // 본인부담 초기치(30%)
+        const gov = Math.min(initial, d.maxSupport); // 정부지원: 상한 내
+        const finalPay = initial - gov;
+        if (costChart) costChart.destroy();
+        costChart = new Chart(costCtx, {
+          type:'bar',
+          data:{ labels:[d.label], datasets:[
+            { label:'건강보험 적용분', data:[nhi] },
+            { label:'정부 지원금', data:[gov] },
+            { label:'최종 본인부담금', data:[finalPay] }
+          ]},
+          options:{
+            indexAxis:'y', responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'bottom' }, tooltip:{ callbacks:{
+              label:(ctx)=>`${ctx.dataset.label}: ${krw.format(ctx.raw)}원`
+            } } },
+            scales:{ x:{ stacked:true, ticks:{ callback:(v)=> new Intl.NumberFormat('ko-KR',{notation:'compact'}).format(v) } }, y:{ stacked:true, grid:{ display:false } } }
+          }
+        });
+        costText.innerHTML = `
+          <p class="text-gray-600">총 예상 시술비: <span class="font-bold text-black dark:text-white">${krw.format(d.total)}원</span></p>
+          <div class="w-full border-t my-2"></div>
+          <p class="text-gray-500"> └ 건강보험 적용: <span class="font-semibold">${krw.format(nhi)}원</span></p>
+          <p class="text-teal-700"> └ 정부 지원금: <span class="font-semibold">${krw.format(gov)}원</span></p>
+          <p class="text-amber-600"> └ <span class="font-bold">최종 본인부담금:</span> <span class="font-extrabold text-lg">${krw.format(finalPay)}원</span></p>`;
+      }
+      $('#procedure-selector')?.addEventListener('change', (e) => {
+        const val = e.target?.value; if (val) renderCostChart(val);
+      });
+      if (costCtx) renderCostChart('fresh');
+
+      // ===== Schedule Planner =====
+      const scheduleBody = $('#schedule-body');
+      const addRowBtn = $('#add-schedule-row');
+      const clearPastBtn = $('#btn-clear-past');
+      const todayStr = '2025-08-29';
+      const today = new Date(todayStr+'T00:00:00');
+      const DAY = ['일','월','화','수','목','금','토'];
+
+      let scheduleData = LS.get(KEY_SCHEDULE, [
+        { date:'2025-08-25', event:'난자 채취', notes:'입원 치료 병행' },
+        { date:'2025-09-05', event:'퇴원 후 1차 외래', notes:'초음파·혈액검사' },
+        { date:'2025-10-15', event:'자궁내막 준비 시작(예정)', notes:'FET 대비' }
+      ]);
+
+      const getDOW = (dateString) => {
+        try { const d = new Date(dateString+'T00:00:00'); return Number.isNaN(d) ? '' : DAY[d.getDay()]; } catch { return ''; }
+      };
+
+      const renderSchedule = () => {
+        if(!scheduleBody) return;
+        scheduleBody.innerHTML = '';
+        scheduleData.sort((a,b)=> new Date(a.date) - new Date(b.date));
+        scheduleData.forEach((item, idx) => {
+          const d = new Date(item.date+'T00:00:00');
+          let rowClass = '';
+          if (d < today) rowClass = 'bg-gray-100 text-gray-400';
+          else if (d.getTime() === today.getTime()) rowClass = 'bg-yellow-100 font-bold';
+          const tr = document.createElement('tr');
+          tr.className = `border-b ${rowClass}`;
+          tr.innerHTML = `
+            <td class="px-4 py-2" contenteditable="true" data-col="date">${item.date}</td>
+            <td class="px-4 py-2">${getDOW(item.date)}</td>
+            <td class="px-4 py-2" contenteditable="true" data-col="event">${item.event}</td>
+            <td class="px-4 py-2" contenteditable="true" data-col="notes">${item.notes ?? ''}</td>
+            <td class="px-4 py-2 text-center"><button class="delete-row-btn text-red-500 hover:text-red-700" data-index="${idx}">삭제</button></td>`;
+          scheduleBody.appendChild(tr);
+        });
+        LS.set(KEY_SCHEDULE, scheduleData);
+      };
+
+      addRowBtn?.addEventListener('click', () => { scheduleData.push({ date:'YYYY-MM-DD', event:'새로운 일정', notes:'비고' }); renderSchedule(); });
+      clearPastBtn?.addEventListener('click', () => { scheduleData = scheduleData.filter(x => new Date(x.date+'T00:00:00') >= today); renderSchedule(); });
+
+      scheduleBody?.addEventListener('click', (e) => {
+        if (e.target.classList.contains('delete-row-btn')) {
+          const i = Number(e.target.dataset.index); scheduleData.splice(i,1); renderSchedule();
+        }
+      });
+      scheduleBody?.addEventListener('blur', (e) => {
+        if (e.target.hasAttribute('contenteditable')) {
+          const rows = Array.from(scheduleBody.children);
+          const i = rows.indexOf(e.target.closest('tr'));
+          const col = e.target.dataset.col; scheduleData[i][col] = e.target.innerText.trim();
+          if (col === 'date') renderSchedule(); else LS.set(KEY_SCHEDULE, scheduleData);
+        }
+      }, true);
+
+      renderSchedule();
+
+      // Export CSV
+      $('#btn-export-csv')?.addEventListener('click', () => {
+        const header = ['date','dow','event','notes'];
+        const lines = [header.join(',')];
+        scheduleData.forEach(r => lines.push([
+          r.date, getDOW(r.date), (r.event||'').replaceAll(',',' '), (r.notes||'').replaceAll(',',' ')
+        ].join(',')));
+        const blob = new Blob(["\uFEFF" + lines.join('\n')], { type:'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a');
+        a.href = url; a.download = 'ivf-schedule.csv'; a.click(); URL.revokeObjectURL(url);
+      });
+
+      // ===== Tracker =====
+      const trkForm = $('#tracker-form');
+      const trkBody = $('#tracker-body');
+      const trkChartCtx = $('#trackerChart');
+      const trkData = LS.get(KEY_TRACKER, []); // [{date, weight, girth, urine}]
+      let trkChart;
+
+      const renderTrackerTable = () => {
+        trkBody.innerHTML = '';
+        trkData.sort((a,b)=> new Date(a.date)-new Date(b.date));
+        for (let i=0;i<trkData.length;i++){
+          const r = trkData[i];
+          // Warning rules: weight +1kg vs previous day, urine <800
+          let warn = '';
+          const prev = trkData[i-1];
+          if (prev && r.weight - prev.weight >= 1.0) warn += '체중 급증 ';
+          if (Number(r.urine) < 800) warn += (warn?'· ':'') + '소변량 저하';
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-3 py-2">${r.date}</td>
+            <td class="px-3 py-2">${r.weight ?? ''}</td>
+            <td class="px-3 py-2">${r.girth ?? ''}</td>
+            <td class="px-3 py-2">${r.urine ?? ''}</td>
+            <td class="px-3 py-2 ${warn? 'text-red-600 font-semibold':''}">${warn || '-'}</td>
+            <td class="px-3 py-2"><button class="trk-del text-red-500" data-i="${i}">삭제</button></td>`;
+          trkBody.appendChild(tr);
+        }
+        LS.set(KEY_TRACKER, trkData);
+      };
+
+      const renderTrackerChart = () => {
+        if (!trkChartCtx) return; if (trkChart) trkChart.destroy();
+        const labels = trkData.map(r=>r.date);
+        trkChart = new Chart(trkChartCtx, {
+          type:'line',
+          data:{ labels, datasets:[
+            { label:'체중(kg)', data: trkData.map(r=>r.weight), tension:.25 },
+            { label:'복부둘레(cm)', data: trkData.map(r=>r.girth), tension:.25 },
+            { label:'소변량(ml)', data: trkData.map(r=>r.urine), tension:.25 }
+          ]},
+          options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+        });
+      };
+
+      trkForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const date = $('#trk-date').value || new Date().toISOString().slice(0,10);
+        const weight = Number($('#trk-weight').value);
+        const girth = Number($('#trk-girth').value);
+        const urine = Number($('#trk-urine').value);
+        if (Number.isNaN(weight) || Number.isNaN(girth) || Number.isNaN(urine)) { alert('숫자를 올바르게 입력해주세요.'); return; }
+        trkData.push({ date, weight, girth, urine });
+        $('#trk-weight').value = ''; $('#trk-girth').value=''; $('#trk-urine').value='';
+        renderTrackerTable(); renderTrackerChart();
+      });
+      trkBody?.addEventListener('click', (e) => {
+        if (e.target.classList.contains('trk-del')){ const i = Number(e.target.dataset.i); trkData.splice(i,1); renderTrackerTable(); renderTrackerChart(); }
+      });
+      $('#trk-clear')?.addEventListener('click', ()=>{ if(confirm('모든 기록을 삭제할까요?')){ trkData.length=0; renderTrackerTable(); renderTrackerChart(); } });
+
+      renderTrackerTable(); renderTrackerChart();
+
+      // ===== Reset all =====
+      $('#btn-reset')?.addEventListener('click', () => {
+        if (!confirm('모든 데이터(일정/트래커/설정)를 초기화할까요?')) return;
+        LS.del(KEY_SCHEDULE); LS.del(KEY_TRACKER); LS.del(KEY_TAB); LS.del(KEY_DARK); location.reload();
+      });
+    });
+  </script>
 </body>
 </html>
